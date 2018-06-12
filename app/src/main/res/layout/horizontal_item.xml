@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/horizontalScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/your_id"
+    android:orientation="vertical"
+    android:scrollbars="none">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical|center_horizontal|center"
+        android:padding="1dp">
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card1"
+            android:layout_width="300dp"
+            android:layout_height="149dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="27dp"
+            android:layout_marginTop="155dp"
+            card_view:cardBackgroundColor="#ffffff"
+            card_view:cardCornerRadius="5dp"
+            card_view:cardElevation="15dp">
+
+
+            <!--
+
+            <ImageView
+                android:id="@+id/contactssnap"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:background="@drawable/rain" />-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="226dp"
+                android:layout_margin="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textview1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="1dp"
+                    android:layout_marginBottom="3dp"
+                    android:text="Current Find Dust Level"
+                    android:textColor="#232323"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="in 온도"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tempInView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+
+
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="in 습도"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/humidInView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="in 먼지"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/dustInView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card3"
+            android:layout_width="300dp"
+            android:layout_height="163dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignStart="@+id/card1"
+            android:layout_marginBottom="34dp"
+            android:orientation="vertical"
+            card_view:cardBackgroundColor="#ffffff"
+            card_view:cardCornerRadius="5dp"
+            card_view:cardElevation="15dp"
+            card_view:contentPadding="3dp">
+
+            <TextView
+                android:id="@+id/textview3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="1dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="Temp/Humidity"
+                android:textColor="#272727"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="226dp"
+                android:layout_margin="20dp"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="out 온도"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tempOutView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="out 습도"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/dustOutView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="out 먼지"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/humidOutView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card4"
+            android:layout_width="300dp"
+            android:layout_height="460dp"
+            android:layout_marginStart = "40dp"
+            android:layout_toEndOf = "@+id/card3"
+            card_view:cardBackgroundColor="#ffffff"
+            card_view:cardCornerRadius="10dp"
+            card_view:cardElevation="15dp"
+            card_view:contentPadding="3dp"
+            android:layout_centerVertical="true">
+            <TextView
+                android:id="@+id/textview4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="1dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:text="News"
+                android:textColor="#272727"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+        </android.support.v7.widget.CardView>
+
+
+    </RelativeLayout>
+</HorizontalScrollView>
