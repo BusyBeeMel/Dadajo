@@ -1,6 +1,10 @@
 package com.example.student.dadajo;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
@@ -30,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     TextView tempOutView;
     TextView humidOutView;
     TextView dustOutView;
-    Switch switchWindow;
+
 
     float temp_in;          // 집 안 온도
     float humid_in;         // 집 안 습도
@@ -40,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     float dust_out;
     int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
 
-    ImageView imageView;
+
+
+    FragmentPagerAdapter adapterViewPager;
 
 
     @Override
@@ -48,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.horizontal_item);
+        setContentView(R.layout.activity_main);
 
         try{
             connectMqtt(); // Mqtt broker 접속
@@ -63,40 +69,16 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         tempOutView = (TextView)findViewById(R.id.tempOutView);
         humidOutView = (TextView)findViewById(R.id.humidOutView);
         dustOutView=(TextView)findViewById(R.id.dustOutView);
-        imageView=(ImageView)findViewById(R.id.img_window);
-        switchWindow=(Switch)findViewById(R.id.switch_window);
 
-        final int stateClose=R.drawable.window_close;
-        final int stateOpen=R.drawable.window_open;
 
-        Glide.with(getApplicationContext())
-                .load(stateClose)
-                .into(imageView);
 
-        switchWindow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(getApplicationContext())
-                                    .load(stateOpen)
-                                    .into(imageView);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(getApplicationContext())
-                                    .load(stateClose)
-                                    .into(imageView);
-                        }
-                    });
-                }
-            }
-        });
+        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
+
+
+
+
     }
 
     public void connectMqtt() throws MqttException{
@@ -228,6 +210,40 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken){
+
+    }
+
+    public static class MyPagerAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 2;
+
+        public MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return FirstFragment.newInstance(0, "Page # 1");
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return SecondFragment.newInstance(1, "Page # 2");
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Page " + position;
+        }
 
     }
 }
