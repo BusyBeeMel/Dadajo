@@ -3,8 +3,13 @@ package com.example.student.dadajo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.student.dadajo.R;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -25,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     TextView tempOutView;
     TextView humidOutView;
     TextView dustOutView;
+    Switch switchWindow;
 
     float temp_in;          // 집 안 온도
     float humid_in;         // 집 안 습도
@@ -32,12 +38,17 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     float humid_out;        // 바깥 습도
     float dust_in;
     float dust_out;
-    int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)
+    int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
+
+    ImageView imageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.horizontal_item);
 
         try{
             connectMqtt(); // Mqtt broker 접속
@@ -52,6 +63,40 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         tempOutView = (TextView)findViewById(R.id.tempOutView);
         humidOutView = (TextView)findViewById(R.id.humidOutView);
         dustOutView=(TextView)findViewById(R.id.dustOutView);
+        imageView=(ImageView)findViewById(R.id.img_window);
+        switchWindow=(Switch)findViewById(R.id.switch_window);
+
+        final int stateClose=R.drawable.window_close;
+        final int stateOpen=R.drawable.window_open;
+
+        Glide.with(getApplicationContext())
+                .load(stateClose)
+                .into(imageView);
+
+        switchWindow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(getApplicationContext())
+                                    .load(stateOpen)
+                                    .into(imageView);
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(getApplicationContext())
+                                    .load(stateClose)
+                                    .into(imageView);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     public void connectMqtt() throws MqttException{
