@@ -66,26 +66,10 @@ public class FirstFragment extends Fragment {
                     Glide.with(getContext())
                             .load(stateOpen)
                             .into(imageView);
-                   /* runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(getContext())
-                                    .load(stateOpen)
-                                    .into(imageView);
-                        }
-                    });*/
                 } else {
                     Glide.with(getContext())
                             .load(stateClose)
                             .into(imageView);
-                    /*runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(getContext())
-                                    .load(stateClose)
-                                    .into(imageView);
-                        }
-                    });*/
                 }
             }
         });
