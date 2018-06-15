@@ -1,5 +1,6 @@
 package com.example.student.dadajo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -7,6 +8,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -80,6 +83,32 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+        //or switch문을 이용하면 될듯 하다.
+        if (id == R.id.action_setting) {
+            Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+
+
 
     public void connectMqtt() throws MqttException{
         client = new MqttClient("tcp://70.12.112.61:1883",

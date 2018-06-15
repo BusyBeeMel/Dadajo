@@ -18,7 +18,7 @@ public class SecondFragment extends Fragment {
 
     private String title;
     private int page;
-    Button setting;
+
 
     // newInstance constructor for creating fragment with arguments
     public static SecondFragment newInstance(int page, String title) {
@@ -43,15 +43,7 @@ public class SecondFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_second, container, false);
-        setting=(Button)view.findViewById(R.id.setting);
 
-        setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getContext(),SettingsActivity.class);
-                startActivity(intent);
-            }
-        });
         return view;
     }
 
