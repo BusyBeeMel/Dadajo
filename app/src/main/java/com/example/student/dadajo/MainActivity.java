@@ -30,7 +30,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 public class MainActivity extends AppCompatActivity implements MqttCallback {
     MqttClient client;
 
-    TextView WindowView;
+/*    TextView WindowView;
     TextView tempInView;
     TextView humidInView;
     TextView dustInView;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     float humid_out;        // 바깥 습도
     float dust_in;
     float dust_out;
-    int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
+    int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]*/
 
 
 
@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             Log.d("notconnection", "접속 실패");
             e.printStackTrace();
         }
+/*
 
         tempInView = (TextView)findViewById(R.id.tempInView);
         humidInView = (TextView)findViewById(R.id.humidInView);
@@ -73,16 +74,13 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         tempOutView = (TextView)findViewById(R.id.tempOutView);
         humidOutView = (TextView)findViewById(R.id.humidOutView);
         dustOutView=(TextView)findViewById(R.id.dustOutView);
+*/
 
 
 
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
-
-
-
-
     }
 
     @Override
@@ -100,8 +98,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             startActivity(intent);
             return true;
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -149,6 +145,9 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         runOnUiThread(new Runnable() { //UI 작업은 UIThread에서
             @Override
             public void run() {
+
+
+
                 if(location.equals("in")) {
                     updateDataIn(sensor, value);
                 }else if(location.equals("out")){
@@ -163,16 +162,16 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     public void updateDataIn(String sensor, String value){
         switch(sensor){
             case "temp":
-                temp_in = Float.parseFloat(value);
-                tempInView.setText(value + "'C");
+                FirstFragment.temp_in = Float.parseFloat(value);
+                FirstFragment.tempInView.setText(value + "'C");
                 break;
             case "humid":
-                humid_in = Float.parseFloat(value);
-                humidInView.setText(value + "%");
+                FirstFragment.humid_in = Float.parseFloat(value);
+                FirstFragment.humidInView.setText(value + "%");
                 break;
             case "dust":
-                dust_in = Float.parseFloat(value);
-                dustInView.setText(value + "%");
+                FirstFragment.dust_in = Float.parseFloat(value);
+                FirstFragment.dustInView.setText(value + "%");
                 break;
             default:
                 break;
@@ -186,16 +185,16 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     public void updateDataOut(String sensor, String value){
         switch(sensor){
             case "temp":
-                temp_out = Float.parseFloat(value);
-                tempOutView.setText(value + "'C");
+                FirstFragment.temp_out = Float.parseFloat(value);
+                FirstFragment.tempOutView.setText(value + "'C");
                 break;
             case "humid":
-                humid_out = Float.parseFloat(value);
-                humidOutView.setText(value + "%");
+                FirstFragment.humid_out = Float.parseFloat(value);
+                FirstFragment.humidOutView.setText(value + "%");
                 break;
             case "dust":
-                dust_out = Float.parseFloat(value);
-                dustOutView.setText(value + "%");
+                FirstFragment.dust_out = Float.parseFloat(value);
+                FirstFragment.dustOutView.setText(value + "%");
                 break;
 
             default:
@@ -209,26 +208,26 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     public void setWindow(){
         int state; // 변화될 창문 상태
 
-        if(dust_in > dust_out){
+        if(FirstFragment.dust_in > FirstFragment.dust_out){
             state = 1;
         }else{
             state = 0;
         }
 
         // 현재 창문 상태와 다를 경우에만 토픽 발행
-        if(state != window_state){
+        if(state != FirstFragment.window_state){
             try {
                 MqttMessage message = new MqttMessage();
                 message.setPayload((state+"").getBytes());
                 client.publish("home/control/window", message);
                 Log.d("publish", message.toString());
-                window_state = state;
+                FirstFragment.window_state = state;
 
                 runOnUiThread(new Runnable() { //UI 작업은 UIThread에서
                     @Override
                     public void run() {
-                        String value = (window_state == 1) ? "Open" : "Close";
-                        WindowView.setText(value);
+                        String value = (FirstFragment.window_state == 1) ? "Open" : "Close";
+                     //   FirstFragment.WindowView.setText(value);
                     }
                 });
 

@@ -19,8 +19,25 @@ import com.bumptech.glide.Glide;
 public class FirstFragment extends Fragment {
     private String title;
     private int page;
-    ImageView imageView;
+    static ImageView imageView;
     Switch switchWindow;
+
+    static TextView WindowView;
+    static TextView tempInView;
+    static TextView humidInView;
+    static TextView dustInView;
+    static TextView tempOutView;
+    static TextView humidOutView;
+    static TextView dustOutView;
+
+
+    static  float temp_in;          // 집 안 온도
+    static float humid_in;         // 집 안 습도
+    static float temp_out;         // 바깥 온도
+    static float humid_out;        // 바깥 습도
+    static float dust_in;
+    static float dust_out;
+    static int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
 
     // newInstance constructor for creating fragment with arguments
     public static FirstFragment newInstance(int page, String title) {
@@ -54,10 +71,16 @@ public class FirstFragment extends Fragment {
 
         final int stateClose=R.drawable.window_close;
         final int stateOpen=R.drawable.window_open;
-
         Glide.with(view.getContext())
                 .load(stateClose)
                 .into(imageView);
+
+        tempInView = (TextView)view.findViewById(R.id.tempInView);
+        humidInView = (TextView)view.findViewById(R.id.humidInView);
+        dustInView=(TextView)view.findViewById(R.id.dustInView);
+        tempOutView = (TextView)view.findViewById(R.id.tempOutView);
+        humidOutView = (TextView)view.findViewById(R.id.humidOutView);
+        dustOutView=(TextView)view.findViewById(R.id.dustOutView);
 
         switchWindow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
