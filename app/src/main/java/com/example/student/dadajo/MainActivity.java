@@ -177,8 +177,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 break;
         }
 
-        // 창문 상태 설정
-        setWindow();
     }
 
     // 바깥 센서값 표시
@@ -199,41 +197,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
             default:
                 break;
-        }
-
-        // 창문 상태 설정
-        setWindow();
-    }
-
-    public void setWindow(){
-        int state; // 변화될 창문 상태
-
-        if(FirstFragment.dust_in > FirstFragment.dust_out){
-            state = 1;
-        }else{
-            state = 0;
-        }
-
-        // 현재 창문 상태와 다를 경우에만 토픽 발행
-        if(state != FirstFragment.window_state){
-            try {
-                MqttMessage message = new MqttMessage();
-                message.setPayload((state+"").getBytes());
-                client.publish("home/control/window", message);
-                Log.d("publish", message.toString());
-                FirstFragment.window_state = state;
-
-                runOnUiThread(new Runnable() { //UI 작업은 UIThread에서
-                    @Override
-                    public void run() {
-                        String value = (FirstFragment.window_state == 1) ? "Open" : "Close";
-                     //   FirstFragment.WindowView.setText(value);
-                    }
-                });
-
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
         }
 
     }
