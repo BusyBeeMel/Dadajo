@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             connectMqtt(); // Mqtt broker 접속
             Log.d("connection", "접속성공");
         }catch (MqttException e){
+            Log.d("notconnection", "접속 실패");
             e.printStackTrace();
         }
 

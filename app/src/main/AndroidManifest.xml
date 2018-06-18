@@ -20,5 +20,6 @@
             android:label="Settings"/>
 
     </application>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 
 </manifest>
