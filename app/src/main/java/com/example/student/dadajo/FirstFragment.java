@@ -63,18 +63,7 @@ public class FirstFragment extends Fragment {
     static float humid_out;        // 바깥 습도
     static float dust_in;
     static float dust_out;
-    static int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
-
-/*    @PUT("window")
-    int putWindow() {
-        return window_state;
-    }
-
-
-    //실행할때부터 window받아오기*/
-
-
-
+    public int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
 
 
     // newInstance constructor for creating fragment with arguments
@@ -96,6 +85,33 @@ public class FirstFragment extends Fragment {
 
 
 
+
+    }
+
+
+
+    // Inflate the view for the fragment based on layout XML
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.fragment_first, container, false);
+
+        imageView=(ImageView)view.findViewById(R.id.img_window);
+        switchWindow=(Switch)view.findViewById(R.id.switch_window);
+
+
+
+        final int stateClose=R.drawable.window_close;
+        final int stateOpen=R.drawable.window_open;
+
+
+        tempInView = (TextView)view.findViewById(R.id.tempInView);
+        humidInView = (TextView)view.findViewById(R.id.humidInView);
+        dustInView=(TextView)view.findViewById(R.id.dustInView);
+        tempOutView = (TextView)view.findViewById(R.id.tempOutView);
+        humidOutView = (TextView)view.findViewById(R.id.humidOutView);
+        dustOutView=(TextView)view.findViewById(R.id.dustOutView);
+
         new Thread() {
             public void run() {
                 try {
@@ -109,6 +125,7 @@ public class FirstFragment extends Fragment {
                             // System.out.println("window 가져오기 성공");
                             Log.d("결과","window 가져오기 성공 " + result);
                             window_state = result;
+
                         }
                     }else {
                         // System.out.println("에러 코드: "+res.code());
@@ -119,33 +136,18 @@ public class FirstFragment extends Fragment {
                 }
             }
         }.start();
-    }
 
-
-
-    // Inflate the view for the fragment based on layout XML
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_first, container, false);
-
-        imageView=(ImageView)view.findViewById(R.id.img_window);
-        switchWindow=(Switch)view.findViewById(R.id.switch_window);
-
-
-
-        final int stateClose=R.drawable.window_close;
-        final int stateOpen=R.drawable.window_open;
-        Glide.with(view.getContext())
-                .load(stateClose)
-                .into(imageView);
-
-        tempInView = (TextView)view.findViewById(R.id.tempInView);
-        humidInView = (TextView)view.findViewById(R.id.humidInView);
-        dustInView=(TextView)view.findViewById(R.id.dustInView);
-        tempOutView = (TextView)view.findViewById(R.id.tempOutView);
-        humidOutView = (TextView)view.findViewById(R.id.humidOutView);
-        dustOutView=(TextView)view.findViewById(R.id.dustOutView);
+        if(window_state == 0){
+            Log.d("결과","window_state " + window_state);
+            Glide.with(getContext())
+                    .load(stateClose)
+                    .into(imageView);
+        }else{
+            Log.d("결과","window_state " + window_state);
+            Glide.with(getContext())
+                    .load(stateOpen)
+                    .into(imageView);
+        }
 
 
 
