@@ -69,10 +69,10 @@ public class SecondFragment extends Fragment {
         List<ChartData> InDust = new ArrayList<>();
 
 
-        InDust.add(new ChartData(4f, 1f)); //values.add(new ChartData(y,x));<br />
-        InDust.add(new ChartData(5f, 2f));
-        InDust.add(new ChartData(6f, 3f));
-        InDust.add(new ChartData(7f, 4f));
+        InDust.add(new ChartData(6f, 1f)); //values.add(new ChartData(y,x));<br />
+        InDust.add(new ChartData(7f, 2f));
+        InDust.add(new ChartData(4f, 3f));
+        InDust.add(new ChartData(5f, 4f));
         InDust.add(new ChartData(9f, 5f));
         InDust.add(new ChartData(8f, 6f));
         InDust.add(new ChartData(6f, 7f));
