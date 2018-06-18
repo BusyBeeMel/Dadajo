@@ -6,6 +6,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.PUT;
+import retrofit2.http.Query;
 
 public interface SensorApi {
     //int window = FirstFragment.window_state;
@@ -16,7 +17,7 @@ public interface SensorApi {
     Call<Integer> getWindow();
 
     @PUT("window")
-    Call<Integer> putWindow();
+    Call<Integer> putWindow(@Query("postId") int windowState);
 
     static SensorApi service =
             new Retrofit.Builder()
@@ -24,6 +25,5 @@ public interface SensorApi {
                     .addConverterFactory(GsonConverterFactory.create())     //문자열->객체 변환시 gson converter를 쓰겠다.
                     .build()   //클래스 생성
                     .create(SensorApi.class);     //타입지정하여 인스턴스 생성
-
 }
 

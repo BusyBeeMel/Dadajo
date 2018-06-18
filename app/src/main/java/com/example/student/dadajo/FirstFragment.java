@@ -162,12 +162,60 @@ public class FirstFragment extends Fragment {
                     Glide.with(getContext())
                             .load(stateOpen)
                             .into(imageView);
+                    window_state = 1;
+
 
                 } else {
                     Glide.with(getContext())
                             .load(stateClose)
                             .into(imageView);
+                    window_state = 0;
                 }
+
+
+
+                new Thread() {
+                    public void run() {
+                        try {
+                            Response<Integer> res = SensorApi.service.putWindow(window_state).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                            if(res.code()==200) {
+                                int result = res.body();
+                                if(result == -1) {
+                                    //System.out.println("window 가져오기 실패");
+                                    Log.d("결과","window 가져오기 실패");
+                                }else {
+                                    // System.out.println("window 가져오기 성공");
+                                    Log.d("결과","window 가져오기 성공 " + result);
+                                    window_state = result;
+
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if(window_state == 0){
+                                                Log.d("결과","window_state " + window_state);
+                                                Glide.with(getContext())
+                                                        .load(stateClose)
+                                                        .into(imageView);
+                                            }else{
+                                                Log.d("결과","window_state " + window_state);
+                                                Glide.with(getContext())
+                                                        .load(stateOpen)
+                                                        .into(imageView);
+                                            }
+                                        }
+                                    });
+
+
+                                }
+                            }else {
+                                // System.out.println("에러 코드: "+res.code());
+                                Log.d("결과","에러 코드: "+res.code());
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
             }
         });
 
