@@ -119,9 +119,6 @@ public class FirstFragment extends Fragment {
                 }
             }
         }.start();
-
-
-
     }
 
 
