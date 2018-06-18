@@ -1,6 +1,7 @@
 package com.example.student.dadajo;
 
 
+import android.app.Activity;
 import android.hardware.Sensor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,9 +46,6 @@ public class FirstFragment extends Fragment {
     Retrofit retrofit;
     SensorApi service;
 
-
-
-
     static TextView WindowView;
     static TextView tempInView;
     static TextView humidInView;
@@ -63,7 +61,10 @@ public class FirstFragment extends Fragment {
     static float humid_out;        // 바깥 습도
     static float dust_in;
     static float dust_out;
+
     public int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
+    final int stateClose=R.drawable.window_close;
+    final int stateOpen=R.drawable.window_open;
 
 
     // newInstance constructor for creating fragment with arguments
@@ -83,7 +84,48 @@ public class FirstFragment extends Fragment {
         page = getArguments().getInt("someInt", 0);
         title = getArguments().getString("someTitle");
 
+        new Thread() {
+            public void run() {
+                try {
+                    Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
+                    if(res.code()==200) {
+                        int result = res.body();
+                        if(result == -1) {
+                            //System.out.println("window 가져오기 실패");
+                            Log.d("결과","window 가져오기 실패");
+                        }else {
+                            // System.out.println("window 가져오기 성공");
+                            Log.d("결과","window 가져오기 성공 " + result);
+                            window_state = result;
 
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(window_state == 0){
+                                        Log.d("결과","window_state " + window_state);
+                                        Glide.with(getContext())
+                                                .load(stateClose)
+                                                .into(imageView);
+                                    }else{
+                                        Log.d("결과","window_state " + window_state);
+                                        Glide.with(getContext())
+                                                .load(stateOpen)
+                                                .into(imageView);
+                                    }
+                                }
+                            });
+
+
+                        }
+                    }else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과","에러 코드: "+res.code());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
 
     }
@@ -100,11 +142,6 @@ public class FirstFragment extends Fragment {
         switchWindow=(Switch)view.findViewById(R.id.switch_window);
 
 
-
-        final int stateClose=R.drawable.window_close;
-        final int stateOpen=R.drawable.window_open;
-
-
         tempInView = (TextView)view.findViewById(R.id.tempInView);
         humidInView = (TextView)view.findViewById(R.id.humidInView);
         dustInView=(TextView)view.findViewById(R.id.dustInView);
@@ -112,42 +149,9 @@ public class FirstFragment extends Fragment {
         humidOutView = (TextView)view.findViewById(R.id.humidOutView);
         dustOutView=(TextView)view.findViewById(R.id.dustOutView);
 
-        new Thread() {
-            public void run() {
-                try {
-                    Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
-                    if(res.code()==200) {
-                        int result = res.body();
-                        if(result == -1) {
-                            //System.out.println("window 가져오기 실패");
-                            Log.d("결과","window 가져오기 실패");
-                        }else {
-                            // System.out.println("window 가져오기 성공");
-                            Log.d("결과","window 가져오기 성공 " + result);
-                            window_state = result;
 
-                        }
-                    }else {
-                        // System.out.println("에러 코드: "+res.code());
-                        Log.d("결과","에러 코드: "+res.code());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
 
-        if(window_state == 0){
-            Log.d("결과","window_state " + window_state);
-            Glide.with(getContext())
-                    .load(stateClose)
-                    .into(imageView);
-        }else{
-            Log.d("결과","window_state " + window_state);
-            Glide.with(getContext())
-                    .load(stateOpen)
-                    .into(imageView);
-        }
+
 
 
 
@@ -168,6 +172,20 @@ public class FirstFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void setWindow(){
+        if(window_state == 0){
+            Log.d("결과","window_state " + window_state);
+            Glide.with(getContext())
+                    .load(stateClose)
+                    .into(imageView);
+        }else{
+            Log.d("결과","window_state " + window_state);
+            Glide.with(getContext())
+                    .load(stateOpen)
+                    .into(imageView);
+        }
     }
 
 }

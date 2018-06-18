@@ -167,11 +167,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 break;
             case "humid":
                 FirstFragment.humid_in = Float.parseFloat(value);
-                FirstFragment.humidInView.setText(value + "%");
+                FirstFragment.humidInView.setText(value);
                 break;
             case "dust":
                 FirstFragment.dust_in = Float.parseFloat(value);
-                FirstFragment.dustInView.setText(value + "%");
+                FirstFragment.dustInView.setText(value);
                 break;
             default:
                 break;
@@ -188,11 +188,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 break;
             case "humid":
                 FirstFragment.humid_out = Float.parseFloat(value);
-                FirstFragment.humidOutView.setText(value + "%");
+                FirstFragment.humidOutView.setText(value);
                 break;
             case "dust":
                 FirstFragment.dust_out = Float.parseFloat(value);
-                FirstFragment.dustOutView.setText(value + "%");
+                FirstFragment.dustOutView.setText(value+"pm");
                 break;
 
             default:

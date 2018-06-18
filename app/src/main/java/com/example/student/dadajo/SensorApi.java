@@ -8,7 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PUT;
 
 public interface SensorApi {
-    int window = FirstFragment.window_state;
+    //int window = FirstFragment.window_state;
 
 
 
