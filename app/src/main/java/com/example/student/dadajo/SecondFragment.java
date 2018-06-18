@@ -25,7 +25,6 @@ public class SecondFragment extends Fragment {
     private String title;
     private int page;
 
-
     // newInstance constructor for creating fragment with arguments
     public static SecondFragment newInstance(int page, String title) {
         SecondFragment fragmentSecond = new SecondFragment();
@@ -114,8 +113,6 @@ public class SecondFragment extends Fragment {
         //string value of the x axis
         multiLineChart.setCircleSize(8f);
         multiLineChart.setData(chart);
-
-
         return view;
     }
 
