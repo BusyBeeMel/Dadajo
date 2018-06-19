@@ -51,6 +51,7 @@ public class SecondFragment extends Fragment {
 
         MultiLineChart multiLineChart = (MultiLineChart) view.findViewById(R.id.chart);
         List<String> h_lables = new ArrayList<>();
+        h_lables.add("0");
         h_lables.add("1");
         h_lables.add("2");
         h_lables.add("3");
@@ -61,40 +62,37 @@ public class SecondFragment extends Fragment {
         h_lables.add("8");
         h_lables.add("9");
         h_lables.add("10");
-        h_lables.add("11");
-        h_lables.add("12");
 
         multiLineChart.setHorizontal_label(h_lables);
 
+        multiLineChart.setScaleY(1);
         List<ChartData> InDust = new ArrayList<>();
 
 
-        InDust.add(new ChartData(6f, 1f)); //values.add(new ChartData(y,x));<br />
-        InDust.add(new ChartData(7f, 2f));
-        InDust.add(new ChartData(4f, 3f));
-        InDust.add(new ChartData(5f, 4f));
-        InDust.add(new ChartData(9f, 5f));
-        InDust.add(new ChartData(8f, 6f));
-        InDust.add(new ChartData(6f, 7f));
-        InDust.add(new ChartData(7f, 8f));
-        InDust.add(new ChartData(10f, 9f));
-        InDust.add(new ChartData(11f,10f));
-        InDust.add(new ChartData(13f,11f));
-        InDust.add(new ChartData(18f,12f));
+        InDust.add(new ChartData(30f, 0f)); //values.add(new ChartData(y,x));<br />
+        InDust.add(new ChartData(20f, 1f));
+        InDust.add(new ChartData(20f, 2f));
+        InDust.add(new ChartData(5f, 3f));
+        InDust.add(new ChartData(9f, 4f));
+        InDust.add(new ChartData(8f, 5f));
+        InDust.add(new ChartData(6f, 6f));
+        InDust.add(new ChartData(7f, 7f));
+        InDust.add(new ChartData(10f, 8f));
+        InDust.add(new ChartData(11f,9f));
+        InDust.add(new ChartData(13f,10f));
 
         List<ChartData> OutDust = new ArrayList<>();
-        OutDust.add(new ChartData(4f, 1f));
-        OutDust.add(new ChartData(5f, 2f));
-        OutDust.add(new ChartData(6f, 3f));
+        OutDust.add(new ChartData(4f, 0f));
+        OutDust.add(new ChartData(5f, 1f));
+        OutDust.add(new ChartData(6f, 2f));
+        OutDust.add(new ChartData(7f, 3f));
         OutDust.add(new ChartData(7f, 4f));
-        OutDust.add(new ChartData(7f, 5f));
-        OutDust.add(new ChartData(9f, 6f));
-        OutDust.add(new ChartData(5f, 7f));
-        OutDust.add(new ChartData(3f, 8f));
-        OutDust.add(new ChartData(5f, 9f));
+        OutDust.add(new ChartData(9f, 5f));
+        OutDust.add(new ChartData(5f, 6f));
+        OutDust.add(new ChartData(3f, 7f));
+        OutDust.add(new ChartData(5f, 8f));
+        OutDust.add(new ChartData(15f,9f));
         OutDust.add(new ChartData(15f,10f));
-        OutDust.add(new ChartData(15f,11f));
-        OutDust.add(new ChartData(8f,12f));
 
         List<ChartData> chart = new ArrayList<>();
         chart.add(new ChartData(InDust));
@@ -102,7 +100,7 @@ public class SecondFragment extends Fragment {
 
         multiLineChart.setLeft(1);
         multiLineChart.setRight(50);
-        //    mScaleFactor = Math.max(.1f, Math.min(mScaleFactor, 10.0f));
+        //    mScaleFactor = jononoj  Math.max(.1f, Math.min(mScaleFactor, 10.0f));
 
 
         //define the lines
