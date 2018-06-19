@@ -177,16 +177,16 @@ public class FirstFragment extends Fragment {
                 new Thread() {
                     public void run() {
                         try {
-                            Response<Integer> res = SensorApi.service.putWindow(window_state).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                            Response<Boolean> res = SensorApi.service.putWindow(window_state).execute(); // 현재 스레드에서 네트워크 작업 요청.
                             if(res.code()==200) {
-                                int result = res.body();
-                                if(result == -1) {
+                                boolean result = res.body();
+                                if(result == true) {
                                     //System.out.println("window 가져오기 실패");
-                                    Log.d("결과","window 가져오기 실패");
+                                    Log.d("결과","window 보내기 성공");
                                 }else {
                                     // System.out.println("window 가져오기 성공");
-                                    Log.d("결과","window 가져오기 성공 " + result);
-                                    window_state = result;
+                                    Log.d("결과","window 보내기 실패 " + result);
+
 
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
@@ -204,8 +204,6 @@ public class FirstFragment extends Fragment {
                                             }
                                         }
                                     });
-
-
                                 }
                             }else {
                                 // System.out.println("에러 코드: "+res.code());

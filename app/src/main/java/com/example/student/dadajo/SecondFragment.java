@@ -113,7 +113,7 @@ public class SecondFragment extends Fragment {
         //string value of the x axis
         multiLineChart.setCircleSize(8f);
         multiLineChart.setData(chart);
+        multiLineChart.setGesture(true);
         return view;
     }
-
 }

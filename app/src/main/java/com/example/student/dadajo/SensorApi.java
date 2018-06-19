@@ -11,9 +11,6 @@ import retrofit2.http.Query;
 
 public interface SensorApi {
     //int window = FirstFragment.window_state;
-
-
-
     @GET("window")
     Call<Integer> getWindow();
 

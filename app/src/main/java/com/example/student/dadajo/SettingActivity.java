@@ -55,12 +55,13 @@ public class SettingActivity extends PreferenceActivity {
                 boolean switched = ((SwitchPreference) preference).isChecked();
 
                 if(switched){
-                    dustSettingState=1;
-                }else{
                     dustSettingState=0;
+                }else{
+                    dustSettingState=1;
                 }
 
                 Log.d("dustSettingState","dustSettingState: "+dustSettingState);
+
                 new Thread() {
                     public void run() {
                         try {
@@ -84,22 +85,23 @@ public class SettingActivity extends PreferenceActivity {
                         }
                     }
                 }.start();
-
-
-                return false;
+                return true;
             }
         });
 
         rainSetting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+
               @Override
               public boolean onPreferenceChange(Preference preference, Object newValue) {
                   boolean switched = ((SwitchPreference) preference).isChecked();
 
                   if(switched){
-                      rainSettingState=1;
-                  }else{
                       rainSettingState=0;
+                  }else{
+                      rainSettingState=1;
                   }
+
+                  Log.d("rainSettingState","rainSettingState: "+rainSettingState);
 
                   new Thread() {
                       @Override
@@ -124,7 +126,7 @@ public class SettingActivity extends PreferenceActivity {
                           }
                       }
                   }.start();
-                  return false;
+                  return true;
               }
 
           });
@@ -169,8 +171,6 @@ public class SettingActivity extends PreferenceActivity {
                 finish();
             }
         });
-
-
 
     }
 
