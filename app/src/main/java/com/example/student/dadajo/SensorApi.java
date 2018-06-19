@@ -6,6 +6,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface SensorApi {
@@ -16,8 +17,14 @@ public interface SensorApi {
     @GET("window")
     Call<Integer> getWindow();
 
-    @PUT("window")
-    Call<Integer> putWindow(@Query("postId") int windowState);
+    @PUT("window/{winState}")
+    Call<Boolean> putWindow(@Path("winState") int winState);
+
+    @PUT("setting/dust/{dust}")
+    Call<Boolean> putDust(@Path("dust") int dustSetting);
+
+    @PUT("setting/rain/{rain}")
+    Call<Boolean> putRain(@Path("rain") int rainSetting);
 
     static SensorApi service =
             new Retrofit.Builder()
