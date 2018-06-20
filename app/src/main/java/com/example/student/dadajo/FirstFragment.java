@@ -50,9 +50,11 @@ public class FirstFragment extends Fragment {
     static TextView tempInView;
     static TextView humidInView;
     static TextView dustInView;
+    static TextView dustInSentence;
     static TextView tempOutView;
     static TextView humidOutView;
     static TextView dustOutView;
+    static TextView dustOutSentence;
 
 
     static  float temp_in;          // 집 안 온도
@@ -103,11 +105,13 @@ public class FirstFragment extends Fragment {
                                 public void run() {
                                     if(window_state == 0){
                                         Log.d("결과","window_state " + window_state);
+                                        switchWindow.setChecked(false);
                                         Glide.with(getContext())
                                                 .load(stateClose)
                                                 .into(imageView);
                                     }else{
                                         Log.d("결과","window_state " + window_state);
+                                        switchWindow.setChecked(true);
                                         Glide.with(getContext())
                                                 .load(stateOpen)
                                                 .into(imageView);
@@ -145,15 +149,11 @@ public class FirstFragment extends Fragment {
         tempInView = (TextView)view.findViewById(R.id.tempInView);
         humidInView = (TextView)view.findViewById(R.id.humidInView);
         dustInView=(TextView)view.findViewById(R.id.dustInView);
+        dustInSentence=(TextView)view.findViewById(R.id.dustInSentence);
         tempOutView = (TextView)view.findViewById(R.id.tempOutView);
         humidOutView = (TextView)view.findViewById(R.id.humidOutView);
         dustOutView=(TextView)view.findViewById(R.id.dustOutView);
-
-
-
-
-
-
+        dustOutSentence=(TextView)view.findViewById(R.id.dustOutSentence);
 
         switchWindow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

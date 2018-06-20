@@ -51,7 +51,6 @@ public class SecondFragment extends Fragment {
 
         MultiLineChart multiLineChart = (MultiLineChart) view.findViewById(R.id.chart);
         List<String> h_lables = new ArrayList<>();
-        h_lables.add("0");
         h_lables.add("1");
         h_lables.add("2");
         h_lables.add("3");
@@ -62,6 +61,8 @@ public class SecondFragment extends Fragment {
         h_lables.add("8");
         h_lables.add("9");
         h_lables.add("10");
+        h_lables.add("11");
+        h_lables.add("12");
 
         multiLineChart.setHorizontal_label(h_lables);
 

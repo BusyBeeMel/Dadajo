@@ -1,7 +1,12 @@
 package com.example.student.dadajo;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,6 +18,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -26,9 +32,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.IOException;
+
+import retrofit2.Response;
+
 
 public class MainActivity extends AppCompatActivity implements MqttCallback {
     MqttClient client;
+    int rainSettingState;
+    int dustSettingState;
 
 /*    TextView WindowView;
     TextView tempInView;
@@ -59,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
+        restoreState();
+
+
         try{
             connectMqtt(); // Mqtt broker 접속
             Log.d("connection", "접속성공");
@@ -81,6 +96,88 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
+
+      /*  SwitchPreference rainSetting = (SwitchPreference)MainActivity.this.findPreference("switch_preference_3");
+        SwitchPreference dustSetting = (SwitchPreference)findPreference("switch_preference_2");*/
+
+
+        new Thread() {
+            public void run() {
+                try {
+                    Response<Boolean> res = SensorApi.service.putDust(dustSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                    if (res.code() == 200) {
+                        Boolean result = res.body();
+                        if (result) {
+                            //System.out.println("window 가져오기 실패");
+                            Log.d("결과", "초기 dustSetting 보내기 성공" + dustSettingState);
+
+                        } else {
+                            // System.out.println("window 가져오기 성공");
+                            Log.d("결과", "초기 dustSetting 보내기 실패 " + result);
+                        }
+                    } else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과", "에러 코드: " + res.code());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("결과", "예외 발생: " + e.getMessage());
+                }
+
+
+                try {
+                    Response<Boolean> res = SensorApi.service.putRain(rainSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                    if (res.code() == 200) {
+                        Boolean result = res.body();
+                        if (result) {
+                            //System.out.println("window 가져오기 실패");
+                            Log.d("결과", "초기 rainSetting 보내기 성공" + rainSettingState);
+                        } else {
+                            // System.out.println("window 가져오기 성공");
+                            Log.d("결과", "초기 rainSetting 보내기 실패 " + result);
+                        }
+                    } else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과", "에러 코드: " + res.code());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("결과", "예외 발생: " + e.getMessage());
+                }
+            }
+        }.start();
+    }
+
+
+
+    protected void restoreState() {
+
+
+        //   SharedPreferences pref = getSharedPreferences("preferences", Activity.MODE_PRIVATE);
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(pref.getBoolean("switch_preference_2", false)){
+            //dust sensor is on. (TRUE)
+            dustSettingState = 1;
+        }else{
+            dustSettingState = 0;
+        }
+
+
+        if(pref.getBoolean("switch_preference_3", false)){
+            //dust sensor is on. (TRUE)
+            rainSettingState = 1;
+        }else{
+            rainSettingState = 0;
+        }
+
+
+/*
+        if ((pref != null) && (pref.contains("switch_preference_2")) ){
+            boolean test = pref.getBoolean("switch_preference_2", false);
+            Log.d("프리퍼런스", "" + test);
+        } else {
+            Log.d("프리퍼런스 읽기 실패", "" + pref.getAll().toString());
+        }*/
     }
 
     @Override
@@ -172,6 +269,22 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             case "dust":
                 FirstFragment.dust_in = Float.parseFloat(value);
                 FirstFragment.dustInView.setText(value);
+
+                float value_int= Float.parseFloat(value);
+                if(value_int<=30.0){
+                    FirstFragment.dustInSentence.setText("좋음");
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#32a1ff"));
+                }else if(value_int>30.0&&value_int<=80.0){
+                    FirstFragment.dustInSentence.setText("보통");
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#00c737"));
+                }else if(value_int>80.0&&value_int<=150.0){
+                    FirstFragment.dustInSentence.setText("나쁨");
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#fd9b5a"));
+                }else{
+                    FirstFragment.dustInSentence.setText("매우 나쁨");
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#ff5959"));
+                }
+
                 break;
             default:
                 break;
@@ -191,14 +304,27 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 FirstFragment.humidOutView.setText(value);
                 break;
             case "dust":
+
                 FirstFragment.dust_out = Float.parseFloat(value);
                 FirstFragment.dustOutView.setText(value+"pm");
+                float value_int= Float.parseFloat(value);
+                if(value_int<=30.0){
+                    FirstFragment.dustOutSentence.setText("좋음");
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#32a1ff"));
+                }else if(value_int>30.0&&value_int<=80.0){
+                    FirstFragment.dustOutSentence.setText("보통");
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#00c737"));
+                }else if(value_int>80.0&&value_int<=150.0){
+                    FirstFragment.dustOutSentence.setText("나쁨");
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#fd9b5a"));
+                }else{
+                    FirstFragment.dustOutSentence.setText("매우 나쁨");
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#ff5959"));
+                }
                 break;
-
             default:
                 break;
         }
-
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken){
