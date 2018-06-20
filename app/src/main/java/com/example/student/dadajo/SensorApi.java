@@ -1,5 +1,7 @@
 package com.example.student.dadajo;
 
+import java.util.Queue;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -23,6 +25,12 @@ public interface SensorApi {
     @PUT("setting/rain/{rain}")
     Call<Boolean> putRain(@Path("rain") int rainSetting);
 
+    @GET("chart/in")
+    Call<Queue> getChartIn();
+
+    @GET("chart/out")
+    Call<Queue> getChartOut();
+
     static SensorApi service =
             new Retrofit.Builder()
                     .baseUrl("http://70.12.112.61:8080/dadajo2/api/sensor/")  //통신할 서버 주소
@@ -30,4 +38,3 @@ public interface SensorApi {
                     .build()   //클래스 생성
                     .create(SensorApi.class);     //타입지정하여 인스턴스 생성
 }
-

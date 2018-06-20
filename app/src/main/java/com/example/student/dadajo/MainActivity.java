@@ -356,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                     return null;
             }
         }
-
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
