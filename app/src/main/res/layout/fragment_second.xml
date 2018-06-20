@@ -28,40 +28,18 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="500dp"
             android:orientation="horizontal"
-            android:id="@id/card1"
-            >
+            android:id="@id/card1">
 
             <com.numetriclabz.numandroidcharts.MultiLineChart
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            android:layout_below = "@+id/card1"
-            android:layout_marginTop="20dp"
-            >
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginLeft="20dp"
-            android:text="공기가 좋아지고 있어요"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:src="@drawable/smile"
-            android:layout_weight="1"
-            />
-        </LinearLayout>
 
         </RelativeLayout>
 
