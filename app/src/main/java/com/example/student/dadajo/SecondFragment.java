@@ -73,21 +73,22 @@ public class SecondFragment extends Fragment {
 
         multiLineChart = (MultiLineChart) view.findViewById(R.id.chart);
         multiLineChart.setScaleY(1);
+        multiLineChart.setScaleX(1);
         getDustValue();
 
         List<String> h_lables = new ArrayList<>();
-        h_lables.add("1");
-        h_lables.add("2");
-        h_lables.add("3");
-        h_lables.add("4");
-        h_lables.add("5");
-        h_lables.add("6");
-        h_lables.add("7");
-        h_lables.add("8");
-        h_lables.add("9");
+        h_lables.add("11시간 전");
         h_lables.add("10");
-        h_lables.add("11");
-        h_lables.add("12");
+        h_lables.add("9");
+        h_lables.add("8");
+        h_lables.add("7");
+        h_lables.add("6");
+        h_lables.add("5");
+        h_lables.add("4");
+        h_lables.add("3");
+        h_lables.add("2");
+        h_lables.add("1시간 전");
+        h_lables.add("현재");
 
         multiLineChart.setHorizontal_label(h_lables);
 
@@ -176,20 +177,62 @@ public class SecondFragment extends Fragment {
     public void showChart(Queue inDustValue, Queue outDustValue){
         List<ChartData> InDust = new ArrayList<>();
         List<ChartData> OutDust = new ArrayList<>();
+        List<ChartData> invisible = new ArrayList<>();
+        //List<ChartData> invisible2 = new ArrayList<>();
+        //List<ChartData> invisible3 = new ArrayList<>();
 
-        for(Integer i=0; i<12; i++){
-            Float y=Float.parseFloat(inDustValue.poll().toString()+"f");
-            Float x=Float.parseFloat(i.toString()+"f");
+        for(Integer i=0; i<120; i+=10){
+            //Float changeY=Float.parseFloat(inDustValue.poll().toString())/10;
+            Float y=Float.parseFloat(inDustValue.poll().toString());
+            Float x=Float.parseFloat(i.toString());
             InDust.add(new ChartData(y,x));
+            Log.d("차트값", "Inchart X " + x);
             Log.d("차트값", "Inchart Y " + y);
             //Log.d("차트값", "Inchart X " + x);
         }
 
-        for(Integer i=0; i<12; i++){
-            Float y=Float.parseFloat(outDustValue.poll()+"f");
-            Float x=Float.parseFloat(i.toString()+"f");
+
+        for(Integer i=0; i<120; i+=10){
+            //Float changeY=Float.parseFloat(outDustValue.poll().toString())/10;
+            Float y=Float.parseFloat(outDustValue.poll().toString());
+            Float x=Float.parseFloat(i.toString());
             OutDust.add(new ChartData(y,x));
+            Log.d("차트값", "Outchart X " + x);
+            Log.d("차트값", "Outchart Y " + y);
         }
+
+        invisible.add(new ChartData(150f,0f));
+        invisible.add(new ChartData(150f,10f));
+        invisible.add(new ChartData(150f,20f));
+        invisible.add(new ChartData(150f,30f));
+        invisible.add(new ChartData(150f,40f));
+        invisible.add(new ChartData(150f,50f));
+        invisible.add(new ChartData(150f,60f));
+        invisible.add(new ChartData(150f,70f));
+        invisible.add(new ChartData(150f,80f));
+        invisible.add(new ChartData(150f,90f));
+        invisible.add(new ChartData(150f,100f));
+        invisible.add(new ChartData(150f,110f));
+
+        /*invisible2.add(new ChartData(15f,0f));
+        invisible2.add(new ChartData(15f,10f));
+        invisible2.add(new ChartData(7f,20f));
+        invisible2.add(new ChartData(2f,30f));
+        invisible2.add(new ChartData(5f,40f));
+        invisible2.add(new ChartData(9f,50f));
+        invisible2.add(new ChartData(10f,60f));
+        invisible2.add(new ChartData(6f,70f));
+        invisible2.add(new ChartData(2f,80f));
+
+        invisible3.add(new ChartData(30f,0f));
+        invisible3.add(new ChartData(60f,10f));
+        invisible3.add(new ChartData(150f,20f));
+        invisible3.add(new ChartData(60f,30f));
+        invisible3.add(new ChartData(3f,40f));
+        invisible3.add(new ChartData(40f,50f));
+        invisible3.add(new ChartData(70f,60f));
+        invisible3.add(new ChartData(90f,70f));
+        invisible3.add(new ChartData(20f,80f));*/
 
         /*InDust.add(new ChartData(30f, 0f)); //values.add(new ChartData(y,x));<br />
         InDust.add(new ChartData(20f, 1f));
@@ -218,19 +261,20 @@ public class SecondFragment extends Fragment {
         List<ChartData> chart = new ArrayList<>();
         chart.add(new ChartData(InDust));
         chart.add(new ChartData(OutDust));
-
+        chart.add(new ChartData(invisible));
+        //chart.add(new ChartData(invisible2));
+        //chart.add(new ChartData(invisible3));
 
         //    mScaleFactor = jononoj  Math.max(.1f, Math.min(mScaleFactor, 10.0f));
 
 
         //define the lines
         List<String> legends = new ArrayList<>();
-        legends.add("In");
-        legends.add("Out");
+        legends.add("실내");
+        legends.add("실외");
         multiLineChart.setLegends(legends);
         //string value of the x axis
         multiLineChart.setCircleSize(8f);
         multiLineChart.setData(chart);
-        multiLineChart.setGesture(true);
     }
 }

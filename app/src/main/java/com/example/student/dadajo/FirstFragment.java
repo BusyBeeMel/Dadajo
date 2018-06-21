@@ -65,7 +65,7 @@ public class FirstFragment extends Fragment {
     static float dust_out;
 
     public int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
-    final int stateClose=R.drawable.window_close;
+    final int stateClose=R.drawable.window_close_dark;
     final int stateOpen=R.drawable.window_open;
 
 

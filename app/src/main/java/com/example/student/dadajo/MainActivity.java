@@ -1,5 +1,6 @@
 package com.example.student.dadajo;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,10 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -33,43 +37,69 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity implements MqttCallback {
+    RelativeLayout main;
     MqttClient client;
     int rainSettingState;
     int dustSettingState;
-
-/*    TextView WindowView;
-    TextView tempInView;
-    TextView humidInView;
-    TextView dustInView;
-    TextView tempOutView;
-    TextView humidOutView;
-    TextView dustOutView;
-
-
-    float temp_in;          // 집 안 온도
-    float humid_in;         // 집 안 습도
-    float temp_out;         // 바깥 온도
-    float humid_out;        // 바깥 습도
-    float dust_in;
-    float dust_out;
-    int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]*/
-
-
-
+    Button settingBtn;
     FragmentPagerAdapter adapterViewPager;
+
+    long mNow;
+    Date mDate;
+    SimpleDateFormat mFormat = new SimpleDateFormat("kk");
+    String mTime;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = new Intent(this, LoadingActivity.class);
+        startActivity(intent);
+
+
+        try {
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            getSupportActionBar().setCustomView(R.layout.custom_bar);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        mTime=getTime();
+        int iTime=Integer.parseInt(mTime);
+        Log.d("앱 실행 시간",mTime);
+
+
+
+
+
+        settingBtn=(Button)findViewById(R.id.settingBtn);
+        settingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        main=(RelativeLayout)findViewById(R.id.main);
+
+        if(iTime>=06&&iTime<=18){
+            main.setBackgroundColor(Color.parseColor("#DCE0DE"));
+        }else{
+            main.setBackgroundColor(Color.parseColor("#6D7170"));
+        }
 
         restoreState();
 
@@ -81,25 +111,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             Log.d("notconnection", "접속 실패");
             e.printStackTrace();
         }
-/*
-
-        tempInView = (TextView)findViewById(R.id.tempInView);
-        humidInView = (TextView)findViewById(R.id.humidInView);
-        dustInView=(TextView)findViewById(R.id.dustInView);
-        tempOutView = (TextView)findViewById(R.id.tempOutView);
-        humidOutView = (TextView)findViewById(R.id.humidOutView);
-        dustOutView=(TextView)findViewById(R.id.dustOutView);
-*/
-
 
 
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
-
-      /*  SwitchPreference rainSetting = (SwitchPreference)MainActivity.this.findPreference("switch_preference_3");
-        SwitchPreference dustSetting = (SwitchPreference)findPreference("switch_preference_2");*/
-
 
         new Thread() {
             public void run() {
@@ -169,39 +185,13 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }else{
             rainSettingState = 0;
         }
-
-
-/*
-        if ((pref != null) && (pref.contains("switch_preference_2")) ){
-            boolean test = pref.getBoolean("switch_preference_2", false);
-            Log.d("프리퍼런스", "" + test);
-        } else {
-            Log.d("프리퍼런스 읽기 실패", "" + pref.getAll().toString());
-        }*/
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
+    private String getTime(){
+        mNow = System.currentTimeMillis();
+        mDate = new Date(mNow);
+        return mFormat.format(mDate);
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        int id = item.getItemId();
-        //or switch문을 이용하면 될듯 하다.
-        if (id == R.id.action_setting) {
-            Intent intent = new Intent(getApplicationContext(),SettingActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
-
-
 
 
     public void connectMqtt() throws MqttException{
@@ -242,9 +232,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         runOnUiThread(new Runnable() { //UI 작업은 UIThread에서
             @Override
             public void run() {
-
-
-
                 if(location.equals("in")) {
                     updateDataIn(sensor, value);
                 }else if(location.equals("out")){
@@ -268,21 +255,21 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 break;
             case "dust":
                 FirstFragment.dust_in = Float.parseFloat(value);
-                FirstFragment.dustInView.setText(value);
+                FirstFragment.dustInView.setText(value+"pm");
 
                 float value_int= Float.parseFloat(value);
                 if(value_int<=30.0){
                     FirstFragment.dustInSentence.setText("좋음");
-                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#32a1ff"));
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#A8DEF2"));
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustInSentence.setText("보통");
-                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#00c737"));
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustInSentence.setText("나쁨");
-                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#fd9b5a"));
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF9436"));
                 }else{
                     FirstFragment.dustInSentence.setText("매우 나쁨");
-                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#ff5959"));
+                    FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF3636"));
                 }
 
                 break;
@@ -310,16 +297,16 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 float value_int= Float.parseFloat(value);
                 if(value_int<=30.0){
                     FirstFragment.dustOutSentence.setText("좋음");
-                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#32a1ff"));
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#A8DEF2"));
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustOutSentence.setText("보통");
-                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#00c737"));
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustOutSentence.setText("나쁨");
-                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#fd9b5a"));
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF9436"));
                 }else{
                     FirstFragment.dustOutSentence.setText("매우 나쁨");
-                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#ff5959"));
+                    FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF3636"));
                 }
                 break;
             default:

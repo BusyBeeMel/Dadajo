@@ -44,68 +44,6 @@ public class SettingActivity extends PreferenceActivity {
         rainSetting = (SwitchPreference)findPreference("switch_preference_3");
         dustSetting = (SwitchPreference)findPreference("switch_preference_2");
 
-/*        if(rainSetting.isChecked()){
-             MainActivity.rainSettingState = 0;
-        }else{
-            MainActivity.rainSettingState = 1;
-        }
-        if(dustSetting.isChecked()){
-            MainActivity.dustSettingState = 0;
-        }else{
-            MainActivity.dustSettingState = 1;
-        }*/
-
-        //set it here to send it to main activity to print it out.
-/*
-
-
-        try {
-            Response<Boolean> res = SensorApi.service.putDust(dustSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
-            if(res.code()==200) {
-                Boolean result = res.body();
-                if(result) {
-                    //System.out.println("window 가져오기 실패");
-                    Log.d("결과","초기 dustSetting 보내기 성공");
-                }else {
-                    // System.out.println("window 가져오기 성공");
-                    Log.d("결과","초기 dustSetting 보내기 실패 " + result);
-                }
-            }else {
-                // System.out.println("에러 코드: "+res.code());
-                Log.d("결과","에러 코드: "+res.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("결과","예외 발생: "+e.getMessage());
-        }
-
-        try {
-            Response<Boolean> res = SensorApi.service.putRain(rainSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
-            if(res.code()==200) {
-                Boolean result = res.body();
-                if(result) {
-                    //System.out.println("window 가져오기 실패");
-                    Log.d("결과","초기 rainSetting 보내기 성공");
-                }else {
-                    // System.out.println("window 가져오기 성공");
-                    Log.d("결과","초기 rainSetting 보내기 실패 " + result);
-                }
-            }else {
-                // System.out.println("에러 코드: "+res.code());
-                Log.d("결과","에러 코드: "+res.code());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("결과","예외 발생: "+e.getMessage());
-        }
-
-*/
-
-
-
-        //rainSetting=(Switch)findViewById(R.id.rainSetting);
-        //dustSetting=(Switch)findViewById(R.id.dustSetting);
-
         dustSetting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -187,40 +125,6 @@ public class SettingActivity extends PreferenceActivity {
               }
 
           });
-        /*rainSetting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-        @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    rainSettingState = 1;
-                } else {
-                    rainSettingState = 0;
-                }
-
-
-
-
-            }
-        });*/
-
-        /*dustSetting.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    dustSettingState = 1;
-                } else {
-                    dustSettingState = 0;
-                }
-
-
-            }
-        });
-*/
-
-
-
-
-
-
 
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

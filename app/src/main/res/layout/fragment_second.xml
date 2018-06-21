@@ -19,8 +19,7 @@
         card_view:cardBackgroundColor="#ffffff"
         card_view:cardCornerRadius="10dp"
         card_view:cardElevation="15dp"
-        card_view:contentPadding="3dp"
-        >
+        card_view:contentPadding="3dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -28,24 +27,20 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_height="550dp"
             android:orientation="horizontal"
             android:id="@id/card1">
 
             <com.numetriclabz.numandroidcharts.MultiLineChart
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
+                android:layout_height="match_parent"
+                android:background="@drawable/chart_back4"/>
         </LinearLayout>
-
-
-
         </RelativeLayout>
 
 
     </android.support.v7.widget.CardView>
-
     <TextView
         android:visibility="invisible"
         android:layout_width="25dp"
