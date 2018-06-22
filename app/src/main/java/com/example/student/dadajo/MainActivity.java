@@ -42,6 +42,13 @@ import java.util.Date;
 
 import retrofit2.Response;
 
+import static com.example.student.dadajo.FirstFragment.dustCloseBright;
+import static com.example.student.dadajo.FirstFragment.dustCloseDark;
+import static com.example.student.dadajo.FirstFragment.dustOpenBright;
+import static com.example.student.dadajo.FirstFragment.dustOpenDark;
+import static com.example.student.dadajo.FirstFragment.switchWindow;
+import static com.example.student.dadajo.FirstFragment.window_state;
+
 
 public class MainActivity extends AppCompatActivity implements MqttCallback {
     RelativeLayout main;
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     Date mDate;
     SimpleDateFormat mFormat = new SimpleDateFormat("kk");
     String mTime;
+    int iTime;
+
 
 
     @Override
@@ -71,11 +80,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             System.out.println(e.getMessage());
         }
 
+
+
         mTime=getTime();
-        int iTime=Integer.parseInt(mTime);
+        iTime=Integer.parseInt(mTime);
         Log.d("앱 실행 시간",mTime);
-
-
 
 
 
@@ -95,9 +104,10 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         setContentView(R.layout.activity_main);
         main=(RelativeLayout)findViewById(R.id.main);
 
-        if(iTime>=06&&iTime<=18){
+
+        if(iTime>=06&&iTime<=18){//낮
             main.setBackgroundColor(Color.parseColor("#DCE0DE"));
-        }else{
+        }else{//밤
             main.setBackgroundColor(Color.parseColor("#6D7170"));
         }
 
@@ -162,7 +172,13 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 }
             }
         }.start();
-    }
+
+
+
+
+
+        }
+
 
 
 
@@ -187,11 +203,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }
     }
 
-    private String getTime(){
-        mNow = System.currentTimeMillis();
-        mDate = new Date(mNow);
-        return mFormat.format(mDate);
-    }
+
 
 
     public void connectMqtt() throws MqttException{
@@ -244,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
     // 집 안 센서값 표시
     public void updateDataIn(String sensor, String value){
+        int airState=0;
+
         switch(sensor){
             case "temp":
                 FirstFragment.temp_in = Float.parseFloat(value);
@@ -258,24 +272,31 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 FirstFragment.dustInView.setText(value+"pm");
 
                 float value_int= Float.parseFloat(value);
+
                 if(value_int<=30.0){
                     FirstFragment.dustInSentence.setText("좋음");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#A8DEF2"));
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustInSentence.setText("보통");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
+                    airState=1;
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustInSentence.setText("나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF9436"));
+                    airState=2;
                 }else{
                     FirstFragment.dustInSentence.setText("매우 나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF3636"));
+                    airState=3;
                 }
+                firstWindowSet(airState);
 
                 break;
             default:
                 break;
         }
+
+
 
     }
 
@@ -314,6 +335,69 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }
     }
 
+    public void firstWindowSet(final int airState){
+        //맨 처음 실행했을 때 창문 상태 가져오기
+        //실외의 절대 수치가 높으면 먼지 창문
+        // ->실외보다도 실내가 높으면 열린 먼지 창문
+        // ->실외보다 실내가 낮으면 닫힌 먼지 창문
+        new Thread() {
+            public void run() {
+                try {
+                    Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
+                    if (res.code() == 200) {
+                        int result = res.body();
+                        if (result == -1) {
+                            //System.out.println("window 가져오기 실패");
+                            Log.d("결과", "window 가져오기 실패");
+                        } else {
+                            // System.out.println("window 가져오기 성공");
+                            Log.d("결과", "window 가져오기 성공 " + result);
+                            window_state = result;
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if ((window_state == 0) && iTime >= 06 && iTime <= 18) {//창문 닫혀있고 낮
+                                        Log.d("결과", "window_state " + window_state);
+                                        switchWindow.setChecked(false);
+
+                                        Glide.with(getApplicationContext())
+                                                .load(dustCloseBright)
+                                                .into(FirstFragment.imageView);
+                                    } else if ((window_state == 0) && iTime <= 06 && iTime >= 18) {//창문 닫혀있고 밤
+                                        Log.d("결과", "window_state " + window_state);
+                                        switchWindow.setChecked(false);
+                                        Glide.with(getApplicationContext())
+                                                .load(dustCloseDark)
+                                                .into(FirstFragment.imageView);
+                                    } else if ((window_state == 1) && iTime >= 06 && iTime <= 18) {//창문 열려있고 낮
+                                        switchWindow.setChecked(true);
+                                        Glide.with(getApplicationContext())
+                                                .load(dustOpenBright)
+                                                .into(FirstFragment.imageView);
+                                    } else if ((window_state == 1) && iTime <= 06 && iTime >= 18) {//창문 열려있고 밤
+                                        switchWindow.setChecked(true);
+                                        Glide.with(getApplicationContext())
+                                                .load(dustOpenDark)
+                                                .into(FirstFragment.imageView);
+                                    }
+                                }
+                            });
+
+
+                        }
+                    } else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과", "에러 코드: " + res.code());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }.start();
+    }
+
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken){
 
     }
@@ -349,5 +433,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             return "Page " + position;
         }
 
+    }
+
+    private String getTime(){
+        mNow = System.currentTimeMillis();
+        mDate = new Date(mNow);
+        return mFormat.format(mDate);
     }
 }

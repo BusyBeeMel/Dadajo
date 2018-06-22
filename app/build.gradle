@@ -17,7 +17,7 @@ android {
         }
     }
     repositories {
-        maven{
+        maven {
             url 'https://dl.bintray.com/sj/maven/'
         }
     }
