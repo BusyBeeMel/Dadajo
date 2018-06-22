@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -39,6 +40,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Response;
 
@@ -174,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }.start();
 
 
-
+        setWindow();
 
 
         }
@@ -256,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
     // 집 안 센서값 표시
     public void updateDataIn(String sensor, String value){
-        int airState=0;
+        //int airState=0;
 
         switch(sensor){
             case "temp":
@@ -279,17 +282,17 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustInSentence.setText("보통");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
-                    airState=1;
+                    //airState=1;
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustInSentence.setText("나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF9436"));
-                    airState=2;
+                   // airState=2;
                 }else{
                     FirstFragment.dustInSentence.setText("매우 나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF3636"));
-                    airState=3;
+                    //airState=3;
                 }
-                firstWindowSet(airState);
+                //firstWindowSet(airState);
 
                 break;
             default:
@@ -312,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 FirstFragment.humidOutView.setText(value);
                 break;
             case "dust":
-
                 FirstFragment.dust_out = Float.parseFloat(value);
                 FirstFragment.dustOutView.setText(value+"pm");
                 float value_int= Float.parseFloat(value);
@@ -330,17 +332,29 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF3636"));
                 }
                 break;
+            case "rain":
+                int rainValue=Integer.parseInt(value);
+                if(rainValue==0){
+
+                }else{
+
+                }
             default:
                 break;
         }
     }
 
-    public void firstWindowSet(final int airState){
+    public void setWindow(){
         //맨 처음 실행했을 때 창문 상태 가져오기
         //실외의 절대 수치가 높으면 먼지 창문
         // ->실외보다도 실내가 높으면 열린 먼지 창문
         // ->실외보다 실내가 낮으면 닫힌 먼지 창문
-        new Thread() {
+
+        Timer t = new Timer();
+
+        t.scheduleAtFixedRate(
+                new TimerTask()
+                {
             public void run() {
                 try {
                     Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
@@ -360,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                                     if ((window_state == 0) && iTime >= 06 && iTime <= 18) {//창문 닫혀있고 낮
                                         Log.d("결과", "window_state " + window_state);
                                         switchWindow.setChecked(false);
-
                                         Glide.with(getApplicationContext())
                                                 .load(dustCloseBright)
                                                 .into(FirstFragment.imageView);
@@ -395,7 +408,9 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 }
             }
 
-        }.start();
+                },
+                0,
+                5000);
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken){
@@ -432,6 +447,8 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         public CharSequence getPageTitle(int position) {
             return "Page " + position;
         }
+
+
 
     }
 

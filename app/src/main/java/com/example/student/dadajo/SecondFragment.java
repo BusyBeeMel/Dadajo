@@ -77,13 +77,13 @@ public class SecondFragment extends Fragment {
         getDustValue();
 
         List<String> h_lables = new ArrayList<>();
-        h_lables.add("11시간 전");
+        /*h_lables.add("11시간 전");
         h_lables.add("10");
         h_lables.add("9");
         h_lables.add("8");
         h_lables.add("7");
-        h_lables.add("6");
-        h_lables.add("5");
+        h_lables.add("6");*/
+        h_lables.add("5시간 전");
         h_lables.add("4");
         h_lables.add("3");
         h_lables.add("2");
@@ -181,7 +181,7 @@ public class SecondFragment extends Fragment {
         //List<ChartData> invisible2 = new ArrayList<>();
         //List<ChartData> invisible3 = new ArrayList<>();
 
-        for(Integer i=0; i<120; i+=10){
+        for(Integer i=0; i<6; i++){
             //Float changeY=Float.parseFloat(inDustValue.poll().toString())/10;
             Float y=Float.parseFloat(inDustValue.poll().toString());
             Float x=Float.parseFloat(i.toString());
@@ -192,7 +192,7 @@ public class SecondFragment extends Fragment {
         }
 
 
-        for(Integer i=0; i<120; i+=10){
+        for(Integer i=0; i<6; i++){
             //Float changeY=Float.parseFloat(outDustValue.poll().toString())/10;
             Float y=Float.parseFloat(outDustValue.poll().toString());
             Float x=Float.parseFloat(i.toString());
@@ -202,61 +202,19 @@ public class SecondFragment extends Fragment {
         }
 
         invisible.add(new ChartData(150f,0f));
-        invisible.add(new ChartData(150f,10f));
-        invisible.add(new ChartData(150f,20f));
-        invisible.add(new ChartData(150f,30f));
-        invisible.add(new ChartData(150f,40f));
-        invisible.add(new ChartData(150f,50f));
-        invisible.add(new ChartData(150f,60f));
+        invisible.add(new ChartData(150f,1f));
+        invisible.add(new ChartData(150f,2f));
+        invisible.add(new ChartData(150f,3f));
+        invisible.add(new ChartData(150f,4f));
+        invisible.add(new ChartData(150f,5f));
+        /*invisible.add(new ChartData(150f,60f));
         invisible.add(new ChartData(150f,70f));
         invisible.add(new ChartData(150f,80f));
         invisible.add(new ChartData(150f,90f));
         invisible.add(new ChartData(150f,100f));
-        invisible.add(new ChartData(150f,110f));
+        invisible.add(new ChartData(150f,110f));*/
 
-        /*invisible2.add(new ChartData(15f,0f));
-        invisible2.add(new ChartData(15f,10f));
-        invisible2.add(new ChartData(7f,20f));
-        invisible2.add(new ChartData(2f,30f));
-        invisible2.add(new ChartData(5f,40f));
-        invisible2.add(new ChartData(9f,50f));
-        invisible2.add(new ChartData(10f,60f));
-        invisible2.add(new ChartData(6f,70f));
-        invisible2.add(new ChartData(2f,80f));
 
-        invisible3.add(new ChartData(30f,0f));
-        invisible3.add(new ChartData(60f,10f));
-        invisible3.add(new ChartData(150f,20f));
-        invisible3.add(new ChartData(60f,30f));
-        invisible3.add(new ChartData(3f,40f));
-        invisible3.add(new ChartData(40f,50f));
-        invisible3.add(new ChartData(70f,60f));
-        invisible3.add(new ChartData(90f,70f));
-        invisible3.add(new ChartData(20f,80f));*/
-
-        /*InDust.add(new ChartData(30f, 0f)); //values.add(new ChartData(y,x));<br />
-        InDust.add(new ChartData(20f, 1f));
-        InDust.add(new ChartData(20f, 2f));
-        InDust.add(new ChartData(5f, 3f));
-        InDust.add(new ChartData(9f, 4f));
-        InDust.add(new ChartData(8f, 5f));
-        InDust.add(new ChartData(6f, 6f));
-        InDust.add(new ChartData(7f, 7f));
-        InDust.add(new ChartData(10f, 8f));
-        InDust.add(new ChartData(11f,9f));
-        InDust.add(new ChartData(13f,10f));
-
-        OutDust.add(new ChartData(4f, 0f));
-        OutDust.add(new ChartData(5f, 1f));
-        OutDust.add(new ChartData(6f, 2f));
-        OutDust.add(new ChartData(7f, 3f));
-        OutDust.add(new ChartData(7f, 4f));
-        OutDust.add(new ChartData(9f, 5f));
-        OutDust.add(new ChartData(5f, 6f));
-        OutDust.add(new ChartData(3f, 7f));
-        OutDust.add(new ChartData(5f, 8f));
-        OutDust.add(new ChartData(15f,9f));
-        OutDust.add(new ChartData(15f,10f));*/
 
         List<ChartData> chart = new ArrayList<>();
         chart.add(new ChartData(InDust));

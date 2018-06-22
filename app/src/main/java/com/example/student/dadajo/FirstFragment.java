@@ -70,10 +70,16 @@ public class FirstFragment extends Fragment {
     public static int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
     final static int window_state_close=R.drawable.window_close;
     final static int window_state_open=R.drawable.window_open;
+
     final static int dustCloseDark=R.drawable.dust_close_dark;
     final static int dustCloseBright=R.drawable.dust_close_bright;
     final static int dustOpenDark=R.drawable.dust_open_dark;
     final static int dustOpenBright=R.drawable.dust_open_bright;
+
+    final static int rainCloseDark=R.drawable.rain_close_dark;
+    final static int rainCloseBright=R.drawable.rain_close_bright;
+    final static int rainOpenDark=R.drawable.rain_open_dark;
+    final static int rainOpenBright=R.drawable.rain_open_bright;
 
 
 
@@ -93,60 +99,6 @@ public class FirstFragment extends Fragment {
         super.onCreate(savedInstanceState);
         page = getArguments().getInt("someInt", 0);
         title = getArguments().getString("someTitle");
-
-
-
-
-
-        /*//맨 처음 실행했을 때 창문 상태 가져오기
-        //실외의 절대 수치가 높으면 먼지 창문
-        // ->실외보다도 실내가 높으면 열린 먼지 창문
-        // ->실외보다 실내가 낮으면 닫힌 먼지 창문
-        new Thread() {
-            public void run() {
-                try {
-                    Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
-                    if(res.code()==200) {
-                        int result = res.body();
-                        if(result == -1) {
-                            //System.out.println("window 가져오기 실패");
-                            Log.d("결과","window 가져오기 실패");
-                        }else {
-                            // System.out.println("window 가져오기 성공");
-                            Log.d("결과","window 가져오기 성공 " + result);
-                            window_state = result;
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(window_state == 0){
-                                        Log.d("결과","window_state " + window_state);
-                                        switchWindow.setChecked(false);
-                                        Glide.with(getContext())
-                                                .load(dustCloseDark)
-                                                .into(imageView);
-                                    }else{
-                                        Log.d("결과","window_state " + window_state);
-                                        switchWindow.setChecked(true);
-                                        Glide.with(getContext())
-                                                .load(dustOpenDark)
-                                                .into(imageView);
-                                    }
-                                }
-                            });
-
-
-                        }
-                    }else {
-                        // System.out.println("에러 코드: "+res.code());
-                        Log.d("결과","에러 코드: "+res.code());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-*/
 
     }
 
@@ -176,14 +128,14 @@ public class FirstFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     Glide.with(getContext())
-                            .load(dustOpenDark)
+                            .load(dustOpenBright)
                             .into(imageView);
                     window_state = 1;
 
 
                 } else {
                     Glide.with(getContext())
-                            .load(dustCloseDark)
+                            .load(dustCloseBright)
                             .into(imageView);
                     window_state = 0;
                 }
@@ -234,20 +186,6 @@ public class FirstFragment extends Fragment {
         });
 
         return view;
-    }
-
-    public void setWindow(){
-        if(window_state == 0){
-            Log.d("결과","window_state " + window_state);
-            Glide.with(getContext())
-                    .load(dustCloseBright)
-                    .into(imageView);
-        }else{
-            Log.d("결과","window_state " + window_state);
-            Glide.with(getContext())
-                    .load(dustOpenDark)
-                    .into(imageView);
-        }
     }
 
 
