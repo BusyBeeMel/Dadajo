@@ -114,6 +114,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="10dp"
+                            android:text="00.00pm"
                             android:textSize="17sp" />
                     </LinearLayout>
 
@@ -134,7 +135,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="25.00'C"/>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -157,7 +159,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="보통"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -176,7 +179,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="00.00"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -259,7 +263,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="10dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="00.00pm"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -279,7 +284,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="25.00'C"/>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -302,7 +308,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="보통"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -321,7 +328,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:textSize="17sp" />
+                            android:textSize="17sp"
+                            android:text="00.00"/>
                     </LinearLayout>
 
                 </LinearLayout>
