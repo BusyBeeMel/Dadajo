@@ -49,8 +49,17 @@ import static com.example.student.dadajo.FirstFragment.dustCloseBright;
 import static com.example.student.dadajo.FirstFragment.dustCloseDark;
 import static com.example.student.dadajo.FirstFragment.dustOpenBright;
 import static com.example.student.dadajo.FirstFragment.dustOpenDark;
+import static com.example.student.dadajo.FirstFragment.rainCloseBright;
+import static com.example.student.dadajo.FirstFragment.rainCloseDark;
+import static com.example.student.dadajo.FirstFragment.rainOpenBright;
+import static com.example.student.dadajo.FirstFragment.rainOpenDark;
+import static com.example.student.dadajo.FirstFragment.state_close_bright;
+import static com.example.student.dadajo.FirstFragment.state_close_dark;
+import static com.example.student.dadajo.FirstFragment.state_open_bright;
+import static com.example.student.dadajo.FirstFragment.state_open_dark;
 import static com.example.student.dadajo.FirstFragment.switchWindow;
 import static com.example.student.dadajo.FirstFragment.window_state;
+
 
 
 public class MainActivity extends AppCompatActivity implements MqttCallback {
@@ -66,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     SimpleDateFormat mFormat = new SimpleDateFormat("kk");
     String mTime;
     int iTime;
+
+    String industValue="좋음";
+    String outdustValue="좋음";
 
 
 
@@ -108,13 +120,13 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         main=(RelativeLayout)findViewById(R.id.main);
 
 
-        if(iTime>=06&&iTime<=18){//낮
+        restoreState();
+
+        if (iTime >= 06 && iTime <= 15) {//낮
             main.setBackgroundColor(Color.parseColor("#DCE0DE"));
-        }else{//밤
+        }else{
             main.setBackgroundColor(Color.parseColor("#6D7170"));
         }
-
-        restoreState();
 
 
         try{
@@ -123,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }catch (MqttException e){
             Log.d("notconnection", "접속 실패");
             e.printStackTrace();
+            Log.d("결과", "mqtt 예외 발생: " + e.getMessage());
         }
 
 
@@ -177,9 +190,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         }.start();
 
 
-        setWindow();
-
-
         }
 
 
@@ -210,13 +220,14 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
 
     public void connectMqtt() throws MqttException{
-        client = new MqttClient("tcp://70.12.112.61:1883",
+        client = new MqttClient("tcp://192.168.0.4:1883",
                 MqttClient.generateClientId(),
                 new MemoryPersistence());
         client.setCallback(this);
         client.connect();
         client.subscribe("home/out/#"); // 구독할 토픽 설정
         client.subscribe("home/in/#");
+        client.subscribe("home/control/window");
     }
 
     @Override
@@ -249,8 +260,12 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             public void run() {
                 if(location.equals("in")) {
                     updateDataIn(sensor, value);
+                    //setWindow(sensor,value);
                 }else if(location.equals("out")){
                     updateDataOut(sensor, value);
+                    //setWindow(sensor,value);
+                }else if(sensor.equals("window")){
+                    setWindow(sensor,value);
                 }
             }
         });
@@ -259,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
     // 집 안 센서값 표시
     public void updateDataIn(String sensor, String value){
-        //int airState=0;
 
         switch(sensor){
             case "temp":
@@ -279,28 +293,26 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 if(value_int<=30.0){
                     FirstFragment.dustInSentence.setText("좋음");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#A8DEF2"));
+                    setWindow("inDust","좋음");
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustInSentence.setText("보통");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
-                    //airState=1;
+                    setWindow("inDust","보통");
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustInSentence.setText("나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF9436"));
-                   // airState=2;
+                    setWindow("inDust","나쁨");
                 }else{
                     FirstFragment.dustInSentence.setText("매우 나쁨");
                     FirstFragment.dustInSentence.setBackgroundColor(Color.parseColor("#FF3636"));
-                    //airState=3;
+                    setWindow("inDust","매우나쁨");
                 }
-                //firstWindowSet(airState);
+
 
                 break;
             default:
                 break;
         }
-
-
-
     }
 
     // 바깥 센서값 표시
@@ -321,97 +333,201 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 if(value_int<=30.0){
                     FirstFragment.dustOutSentence.setText("좋음");
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#A8DEF2"));
+                    setWindow("outDust","좋음");
                 }else if(value_int>30.0&&value_int<=80.0){
                     FirstFragment.dustOutSentence.setText("보통");
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#6BEC62"));
+                    setWindow("outDust","보통");
                 }else if(value_int>80.0&&value_int<=150.0){
                     FirstFragment.dustOutSentence.setText("나쁨");
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF9436"));
+                    setWindow("outDust","나쁨");
                 }else{
                     FirstFragment.dustOutSentence.setText("매우 나쁨");
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF3636"));
+                    setWindow("outDust","매우나쁨");
                 }
                 break;
+
             case "rain":
-                int rainValue=Integer.parseInt(value);
-                if(rainValue==0){
-
-                }else{
-
-                }
+                //int rainValue=Integer.parseInt(value);
+                setWindow("rain",value);
             default:
                 break;
         }
     }
 
-    public void setWindow(){
-        //맨 처음 실행했을 때 창문 상태 가져오기
-        //실외의 절대 수치가 높으면 먼지 창문
-        // ->실외보다도 실내가 높으면 열린 먼지 창문
-        // ->실외보다 실내가 낮으면 닫힌 먼지 창문
-
-        Timer t = new Timer();
-
-        t.scheduleAtFixedRate(
-                new TimerTask()
-                {
-            public void run() {
-                try {
-                    Response<Integer> res = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
-                    if (res.code() == 200) {
-                        int result = res.body();
-                        if (result == -1) {
-                            //System.out.println("window 가져오기 실패");
-                            Log.d("결과", "window 가져오기 실패");
-                        } else {
-                            // System.out.println("window 가져오기 성공");
-                            Log.d("결과", "window 가져오기 성공 " + result);
-                            window_state = result;
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if ((window_state == 0) && iTime >= 06 && iTime <= 18) {//창문 닫혀있고 낮
-                                        Log.d("결과", "window_state " + window_state);
-                                        switchWindow.setChecked(false);
-                                        Glide.with(getApplicationContext())
-                                                .load(dustCloseBright)
-                                                .into(FirstFragment.imageView);
-                                    } else if ((window_state == 0) && iTime <= 06 && iTime >= 18) {//창문 닫혀있고 밤
-                                        Log.d("결과", "window_state " + window_state);
-                                        switchWindow.setChecked(false);
-                                        Glide.with(getApplicationContext())
-                                                .load(dustCloseDark)
-                                                .into(FirstFragment.imageView);
-                                    } else if ((window_state == 1) && iTime >= 06 && iTime <= 18) {//창문 열려있고 낮
-                                        switchWindow.setChecked(true);
-                                        Glide.with(getApplicationContext())
-                                                .load(dustOpenBright)
-                                                .into(FirstFragment.imageView);
-                                    } else if ((window_state == 1) && iTime <= 06 && iTime >= 18) {//창문 열려있고 밤
-                                        switchWindow.setChecked(true);
-                                        Glide.with(getApplicationContext())
-                                                .load(dustOpenDark)
-                                                .into(FirstFragment.imageView);
-                                    }
-                                }
-                            });
+    public void setWindow(String sensor, String value) {
+        Float rainValue = 0.00f;
+        if (sensor.equals("rain")) {
+            rainValue = Float.parseFloat(value);
+        }
 
 
-                        }
+        if (sensor.equals("inDust")) {
+            industValue = value;
+            Log.d("dust 상태", industValue);
+        }
+
+        if (sensor.equals("outDust")) {
+            outdustValue = value;
+            Log.d("dust 상태", outdustValue);
+        }
+
+        if (sensor.equals("window")) {
+            if (value.equals("true")) {
+                window_state = 1;
+                Log.d("window_state 값", value);
+            } else {
+                window_state = 0;
+                Log.d("window_state 값", "닫힘" + window_state);
+            }
+
+        }
+
+        if (iTime >= 06 && iTime <= 15) {//낮
+
+            restoreState();
+            Log.d("window_state 값 다시받음", window_state + "");
+            if (dustSettingState == 1 && rainSettingState == 0) {//미세먼지만 자동개폐 on
+                if (window_state == 1) {
+                    if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                        Glide.with(getApplicationContext())
+                                .load(state_open_bright)
+                                .into(FirstFragment.imageView);
                     } else {
-                        // System.out.println("에러 코드: "+res.code());
-                        Log.d("결과", "에러 코드: " + res.code());
+                        Glide.with(getApplicationContext())
+                                .load(dustOpenBright)
+                                .into(FirstFragment.imageView);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } else {
+                    if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                        Glide.with(getApplicationContext())
+                                .load(state_close_bright)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(dustCloseBright)
+                                .into(FirstFragment.imageView);
+                    }
+                }
+            } else if (dustSettingState == 0 && rainSettingState == 1) {//비만 자동개폐 on
+
+                if (window_state == 1) {
+                    if (rainValue > 0) {
+                        Glide.with(getApplicationContext())
+                                .load(rainOpenBright)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(state_open_bright)
+                                .into(FirstFragment.imageView);
+                    }
+                } else if (window_state == 0) {
+                    if (rainValue > 0) {
+                        Glide.with(getApplicationContext())
+                                .load(rainCloseBright)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(state_close_bright)
+                                .into(FirstFragment.imageView);
+                    }
+                }
+            }else if (dustSettingState == 1 && rainSettingState == 1) {//둘 다 자동개폐 on
+                if (window_state == 1) {
+                        if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                            Glide.with(getApplicationContext())
+                                    .load(state_open_bright)
+                                    .into(FirstFragment.imageView);
+
+                        } else {
+                            Glide.with(getApplicationContext())
+                                    .load(dustOpenBright)
+                                    .into(FirstFragment.imageView);
+                        }
+
+                }else{
+                            Glide.with(getApplicationContext())
+                                    .load(rainCloseBright)
+                                    .into(FirstFragment.imageView);
+
+
                 }
             }
 
-                },
-                0,
-                5000);
+        } else {//밤
+
+            restoreState();
+            Log.d("window_state 값 다시받음", window_state + "");
+            if (dustSettingState == 1 && rainSettingState == 0) {//미세먼지만 자동개폐 on
+                if (window_state == 1) {
+                    if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                        Glide.with(getApplicationContext())
+                                .load(state_open_dark)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(dustOpenDark)
+                                .into(FirstFragment.imageView);
+                    }
+                } else {
+                    if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                        Glide.with(getApplicationContext())
+                                .load(state_close_dark)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(dustCloseDark)
+                                .into(FirstFragment.imageView);
+                    }
+                }
+            } else if (dustSettingState == 0 && rainSettingState == 1) {//비만 자동개폐 on
+
+                if (window_state == 1) {
+                    if (rainValue > 0) {
+                        Glide.with(getApplicationContext())
+                                .load(rainOpenDark)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(state_open_dark)
+                                .into(FirstFragment.imageView);
+                    }
+                } else if (window_state == 0) {
+                    if (rainValue > 0) {
+                        Glide.with(getApplicationContext())
+                                .load(rainCloseDark)
+                                .into(FirstFragment.imageView);
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(state_close_dark)
+                                .into(FirstFragment.imageView);
+                    }
+                }
+            }else if (dustSettingState == 1 && rainSettingState == 1) {//둘 다 자동개폐 on
+                if (window_state == 1) {
+                    if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                        Glide.with(getApplicationContext())
+                                .load(state_open_dark)
+                                .into(FirstFragment.imageView);
+
+                    } else {
+                        Glide.with(getApplicationContext())
+                                .load(dustOpenDark)
+                                .into(FirstFragment.imageView);
+                    }
+
+                }else{
+                    Glide.with(getApplicationContext())
+                            .load(rainCloseDark)
+                            .into(FirstFragment.imageView);
+                }
+            }
+        }
     }
+
+
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken){
 

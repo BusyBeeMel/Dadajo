@@ -97,8 +97,6 @@ public class SecondFragment extends Fragment {
 
     //한 시간마다 미세먼지 데이터 받아오는 메서드
     public void getDustValue() {
-
-
         Timer t = new Timer();
 
         t.scheduleAtFixedRate(
@@ -170,7 +168,7 @@ public class SecondFragment extends Fragment {
                 3600000);
 
 
-    };
+    }
 
 
     //한 시간마다 차트 뿌려주는 메서드

@@ -1,16 +1,16 @@
 package com.example.student.dadajo;
 
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.hardware.Sensor;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -19,23 +19,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Observable;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import okhttp3.ResponseBody;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
-import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
 
 
 /**
@@ -68,8 +57,11 @@ public class FirstFragment extends Fragment {
     static float dust_out;
 
     public static int window_state = 0;   // 현재 창문 상태(1 이면 열림, 0 이면 닫힘)]
-    final static int window_state_close=R.drawable.window_close;
-    final static int window_state_open=R.drawable.window_open;
+    final static int state_close_bright=R.drawable.window_close_bright;
+    final static int state_open_bright=R.drawable.window_open_bright;
+    final static int state_close_dark=R.drawable.window_close_dark;
+    final static int state_open_dark=R.drawable.window_open_dark;
+
 
     final static int dustCloseDark=R.drawable.dust_close_dark;
     final static int dustCloseBright=R.drawable.dust_close_bright;
@@ -100,6 +92,38 @@ public class FirstFragment extends Fragment {
         page = getArguments().getInt("someInt", 0);
         title = getArguments().getString("someTitle");
 
+
+        new Thread() {
+            public void run() {
+                int windowState = 0;
+                try {
+                    Response<Integer> window = SensorApi.service.getWindow().execute(); // 현재 스레드에서 네트워크 작업 요청.
+
+                    if (window.code() == 200) {
+                        windowState = window.body();
+                        if (windowState == 0) {
+                            //System.out.println("window 가져오기 실패");
+                            // Log.d("결과", "Inchart 가져오기 실패");
+                            window_state = 0;
+                        } else {
+                            // System.out.println("window 가져오기 성공");
+                            // Log.d("결과", "Inchart 가져오기 성공 " + inDustValue);
+                            window_state = 1;
+                        }
+                    } else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과", "에러 코드: " + window.code());
+                    }
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+        }.start();
     }
 
 
@@ -124,21 +148,140 @@ public class FirstFragment extends Fragment {
         dustOutSentence=(TextView)view.findViewById(R.id.dustOutSentence);
 
         switchWindow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Glide.with(getContext())
-                            .load(dustOpenBright)
-                            .into(imageView);
-                    window_state = 1;
 
 
-                } else {
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("안내");
+                builder.setMessage("자동 개폐기능을 종료할까요?");
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String message = "자동개폐기능을 종료합니다.";
+
+
+                        //ifelse
+
+
+
+                        Glide.with(getContext())
+                                .load(dustOpenBright)
+                                .into(imageView);
+
+
+
+
+
+
+
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        prefs.edit().putBoolean("switch_preference_2",false).apply();
+                        prefs.edit().putBoolean("switch_preference_3",false).apply();
+
+
+                /*        SharedPreferences dust = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        //edit dust setting
+                       editor = dust.edit();
+                        editor.putBoolean("false", dust.getBoolean("switch_preference_3", false));*/
+                        new Thread() {
+                            public void run() {
+
+
+                                try {
+                                    Response<Boolean> res = SensorApi.service.putDust(SettingActivity.dustSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                                    Response<Boolean> res1 = SensorApi.service.putRain(SettingActivity.rainSettingState).execute();
+
+                                    if(res.code()==200) {
+                                        Boolean result = res.body();
+                                        if(result) {
+                                            //System.out.println("window 가져오기 실패");
+                                            Log.d("결과","dustSetting 보내기 성공");
+                                        }else {
+                                            // System.out.println("window 가져오기 성공");
+                                            Log.d("결과","dustSetting 보내기 실패 " + result);
+                                        }
+                                    }else {
+                                        // System.out.println("에러 코드: "+res.code());
+                                        Log.d("결과","에러 코드: "+res.code());
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    Log.d("결과","예외 발생: "+e.getMessage());
+                                }
+                            }
+                        }.start();
+
+                    }
+                }).setNegativeButton("아니오",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String message = "취소했습니다.";
+
+                    }
+                });
+
+                if(isChecked) {
+                    builder.show();
+
+                }else{
+
+
+                    //ifelse
+
                     Glide.with(getContext())
                             .load(dustCloseBright)
                             .into(imageView);
                     window_state = 0;
                 }
+
+
+/*
+
+
+                 final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                alertDialogBuilder.setMessage("창문 자동개폐 기능을 끌까요?").setPositiveButton("네", new DialogInterface.OnClickListener() {
+
+
+
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        SharedPreferences rain = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        SharedPreferences.Editor editor = rain.edit();
+                        editor.putBoolean("false", rain.getBoolean("switch_preference_2", false));
+                        SharedPreferences dust = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        //edit dust setting
+                        editor = dust.edit();
+                        editor.putBoolean("false", dust.getBoolean("switch_preference_3", false));
+
+                        if(isChecked) {
+                            Glide.with(getContext())
+                                    .load(dustOpenBright)
+                                    .into(imageView);
+                            window_state = 1;
+                            alertDialogBuilder.create();
+                            alertDialogBuilder.show();
+
+                        }else{
+                            Glide.with(getContext())
+                                    .load(dustCloseBright)
+                                    .into(imageView);
+                            window_state = 0;
+                            alertDialogBuilder.create();
+                            alertDialogBuilder.show();
+                        }
+                    }
+                }).setNegativeButton("아니요", new DialogInterface.OnClickListener()  {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    };
+                    // Create the AlertDialog object and return it
+                });
+*/
+
+
 
 
 
@@ -184,6 +327,7 @@ public class FirstFragment extends Fragment {
                 }.start();
             }
         });
+
 
         return view;
     }

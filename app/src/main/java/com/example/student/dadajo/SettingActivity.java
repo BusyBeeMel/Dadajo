@@ -29,8 +29,8 @@ public class SettingActivity extends PreferenceActivity {
 
      SwitchPreference rainSetting;
      SwitchPreference dustSetting;
-    int rainSettingState=0;
-    int dustSettingState=0;
+    static int rainSettingState=0;
+    static int dustSettingState=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,9 @@ public class SettingActivity extends PreferenceActivity {
 
                 Log.d("dustSettingState","dustSettingState: "+dustSettingState);
 
-                new Thread() {
+
+                updateSetting();
+         /*       new Thread() {
                     public void run() {
                         try {
                             Response<Boolean> res = SensorApi.service.putDust(dustSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
@@ -79,10 +81,12 @@ public class SettingActivity extends PreferenceActivity {
                             Log.d("결과","예외 발생: "+e.getMessage());
                         }
                     }
-                }.start();
+                }.start();*/
                 return true;
             }
         });
+
+
 
         rainSetting.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
@@ -134,5 +138,31 @@ public class SettingActivity extends PreferenceActivity {
         });
 
     }
+
+    public void updateSetting(){
+        new Thread() {
+            public void run() {
+                try {
+                    Response<Boolean> res = SensorApi.service.putDust(dustSettingState).execute(); // 현재 스레드에서 네트워크 작업 요청.
+                    if(res.code()==200) {
+                        Boolean result = res.body();
+                        if(result) {
+                            //System.out.println("window 가져오기 실패");
+                            Log.d("결과","dustSetting 보내기 성공");
+                        }else {
+                            // System.out.println("window 가져오기 성공");
+                            Log.d("결과","dustSetting 보내기 실패 " + result);
+                        }
+                    }else {
+                        // System.out.println("에러 코드: "+res.code());
+                        Log.d("결과","에러 코드: "+res.code());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("결과","예외 발생: "+e.getMessage());
+                }
+            }
+        }.start();
+    };
 
 }
