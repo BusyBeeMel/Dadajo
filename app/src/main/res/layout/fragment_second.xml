@@ -19,23 +19,30 @@
         card_view:cardElevation="15dp"
         card_view:contentPadding="3dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="550dp"
-            android:orientation="horizontal"
-            android:id="@id/card1">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@id/card1"
+            android:weightSum="5">
 
             <com.numetriclabz.numandroidcharts.MultiLineChart
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/chart_back4"/>
+                android:layout_height="0dp"
+                android:background="@drawable/chart_back4"
+                android:layout_weight="4"/>
+
+            <TextView
+                android:id="@+id/dustSentence"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:text="공기가 좋아지고 있어요"
+                android:layout_weight="1"/>
         </LinearLayout>
-        </RelativeLayout>
+
 
 
     </android.support.v7.widget.CardView>

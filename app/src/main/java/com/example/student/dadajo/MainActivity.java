@@ -2,8 +2,15 @@ package com.example.student.dadajo;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -12,6 +19,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -59,14 +67,15 @@ import static com.example.student.dadajo.FirstFragment.state_open_bright;
 import static com.example.student.dadajo.FirstFragment.state_open_dark;
 import static com.example.student.dadajo.FirstFragment.switchWindow;
 import static com.example.student.dadajo.FirstFragment.window_state;
-
+import static com.example.student.dadajo.SettingActivity.dustSettingState;
+import static com.example.student.dadajo.SettingActivity.rainSettingState;
 
 
 public class MainActivity extends AppCompatActivity implements MqttCallback {
     RelativeLayout main;
     MqttClient client;
-    int rainSettingState;
-    int dustSettingState;
+    /*static int rainSettingState;
+    static int dustSettingState;*/
     Button settingBtn;
     FragmentPagerAdapter adapterViewPager;
 
@@ -74,12 +83,23 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
     Date mDate;
     SimpleDateFormat mFormat = new SimpleDateFormat("kk");
     String mTime;
-    int iTime;
+    static int iTime;
 
-    String industValue="좋음";
-    String outdustValue="좋음";
+    static String industValue="좋음";
+    static String outdustValue="좋음";
+    static Float rainValue = 0.00f;
 
+    static Context context;
 
+    static boolean isDustBad=true;
+    static boolean isRainning=true;
+
+    static NotificationManager mNotificationManager;
+    NotificationCompat.Builder windowBuilderOpen;
+    NotificationCompat.Builder windowBuilderClose;
+    NotificationCompat.Builder dustBuilder;
+    NotificationCompat.Builder rainBuilder;
+    int notifyId=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         Intent intent = new Intent(this, LoadingActivity.class);
         startActivity(intent);
 
+        context=getApplicationContext();
 
         try {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -114,19 +135,12 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
 
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
         main=(RelativeLayout)findViewById(R.id.main);
 
 
         restoreState();
-
-        if (iTime >= 06 && iTime <= 15) {//낮
-            main.setBackgroundColor(Color.parseColor("#DCE0DE"));
-        }else{
-            main.setBackgroundColor(Color.parseColor("#6D7170"));
-        }
 
 
         try{
@@ -142,6 +156,82 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
+
+        if (iTime >= 06 && iTime <= 12) {//낮
+            main.setBackgroundColor(Color.parseColor("#DCE0DE"));
+        }else{
+            main.setBackgroundColor(Color.parseColor("#6D7170"));
+        }
+
+        Bitmap mLargeIconForNoti =
+                BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+
+        PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this, 0,
+                new Intent(getApplicationContext(), MainActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+
+
+        // 알림 ID
+        int notifyID = 1;
+
+        // 위에서 생성한 채널 ID 이름
+        String CHANNEL_ID = "my_channel_01";
+
+        windowBuilderOpen =
+                new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("창문 개폐 알림")
+                        .setContentText("창문이 열렸어요")
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
+                        .setLargeIcon(mLargeIconForNoti)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true)
+                        .setContentIntent(mPendingIntent)
+                        .setChannelId(CHANNEL_ID);
+
+        windowBuilderClose =
+                new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("창문 개폐 알림")
+                        .setContentText("창문이 닫혔어요")
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
+                        .setLargeIcon(mLargeIconForNoti)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true)
+                        .setContentIntent(mPendingIntent)
+                        .setChannelId(CHANNEL_ID);
+
+        dustBuilder =
+                new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("미세먼지 경보")
+                        .setContentText("실외 미세먼지가 나빠요! 외부 활동에 주의하세요")
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
+                        .setLargeIcon(mLargeIconForNoti)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true)
+                        .setContentIntent(mPendingIntent)
+                        .setChannelId(CHANNEL_ID);
+
+        rainBuilder =
+                new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("비 알림")
+                        .setContentText("비가 오고 있어요!")
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
+                        .setLargeIcon(mLargeIconForNoti)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setAutoCancel(true)
+                        .setContentIntent(mPendingIntent)
+                        .setChannelId(CHANNEL_ID)
+                        .setWhen(System.currentTimeMillis());
+
+
 
         new Thread() {
             public void run() {
@@ -188,18 +278,16 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 }
             }
         }.start();
-
-
-        }
+    }
 
 
 
 
-    protected void restoreState() {
+    protected static void restoreState() {
 
 
         //   SharedPreferences pref = getSharedPreferences("preferences", Activity.MODE_PRIVATE);
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         if(pref.getBoolean("switch_preference_2", false)){
             //dust sensor is on. (TRUE)
             dustSettingState = 1;
@@ -220,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
 
     public void connectMqtt() throws MqttException{
-        client = new MqttClient("tcp://192.168.0.4:1883",
+        client = new MqttClient("tcp://192.168.43.151:1883",
                 MqttClient.generateClientId(),
                 new MemoryPersistence());
         client.setCallback(this);
@@ -228,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         client.subscribe("home/out/#"); // 구독할 토픽 설정
         client.subscribe("home/in/#");
         client.subscribe("home/control/window");
+        client.subscribe("home/control/air");
     }
 
     @Override
@@ -255,6 +344,8 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
         final String value = new String(mqttMessage.getPayload());  // 센서값
         Log.d("lsv", location+")"+sensor+": "+value);
 
+
+
         runOnUiThread(new Runnable() { //UI 작업은 UIThread에서
             @Override
             public void run() {
@@ -265,7 +356,11 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                     updateDataOut(sensor, value);
                     //setWindow(sensor,value);
                 }else if(sensor.equals("window")){
+                    Log.d("윈도우", "윈도우 받음");
                     setWindow(sensor,value);
+                    if(SettingActivity.windowAlarmState==1) {
+                        showWindowNotification(value);
+                    }
                 }
             }
         });
@@ -347,22 +442,114 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                     FirstFragment.dustOutSentence.setBackgroundColor(Color.parseColor("#FF3636"));
                     setWindow("outDust","매우나쁨");
                 }
+
+                if(value_int>=80.0&&isDustBad){
+                    showDustNotification();
+                    isDustBad=false;
+                }else{
+                    isDustBad=true;
+                }
                 break;
 
             case "rain":
-                //int rainValue=Integer.parseInt(value);
+                Float rainValue=Float.parseFloat(value);
                 setWindow("rain",value);
+
+                if(rainValue>=30.0&&isRainning){
+                    showRainNotification();
+                    isRainning=false;
+                }else{
+                    isRainning=true;
+                }
+
+
+
             default:
                 break;
         }
     }
 
-    public void setWindow(String sensor, String value) {
-        Float rainValue = 0.00f;
+    //창문 개폐 알림
+    public void showWindowNotification(String windowState) {
+
+        // 채널 ID
+        String id = "my_channel_01";
+
+        // 채널 이름
+        CharSequence name = "test";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+
+        // 알림 채널에 사용할 설정을 구성
+        mChannel.enableLights(true);
+        mChannel.setLightColor(Color.BLUE);
+        mChannel.enableVibration(true);
+        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+
+        // 뱃지 사용 여부를 설정한다.(8.0부터는 기본이 true)
+        mChannel.setShowBadge(false);
+        mNotificationManager.createNotificationChannel(mChannel);
+
+        if(windowState.equals("true")){
+            mNotificationManager.notify(0, windowBuilderOpen.build());
+        }else{
+            mNotificationManager.notify(1, windowBuilderClose.build());
+        }
+
+    }
+
+    //미세먼지 경보 알림
+    public void showDustNotification() {
+        // 채널 ID
+        String id = "my_channel_01";
+
+        // 채널 이름
+        CharSequence name = "test";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+
+        // 알림 채널에 사용할 설정을 구성
+        mChannel.enableLights(true);
+        mChannel.setLightColor(Color.BLUE);
+        mChannel.enableVibration(true);
+        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+
+        // 뱃지 사용 여부를 설정한다.(8.0부터는 기본이 true)
+        mChannel.setShowBadge(false);
+        mNotificationManager.createNotificationChannel(mChannel);
+        mNotificationManager.notify(2, dustBuilder.build());
+    }
+
+    //창문 개폐 알림
+    public void showRainNotification() {
+
+        // 채널 ID
+        String id = "my_channel_01";
+
+        // 채널 이름
+        CharSequence name = "test";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+        NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+
+        // 알림 채널에 사용할 설정을 구성
+        mChannel.enableLights(true);
+        mChannel.setLightColor(Color.BLUE);
+        mChannel.enableVibration(true);
+        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+
+        // 뱃지 사용 여부를 설정한다.(8.0부터는 기본이 true)
+        mChannel.setShowBadge(false);
+        mNotificationManager.createNotificationChannel(mChannel);
+        mNotificationManager.notify(3, rainBuilder.build());
+
+    }
+
+
+    public static void setWindow(String sensor, String value) {
+
         if (sensor.equals("rain")) {
             rainValue = Float.parseFloat(value);
         }
-
 
         if (sensor.equals("inDust")) {
             industValue = value;
@@ -382,31 +569,30 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
                 window_state = 0;
                 Log.d("window_state 값", "닫힘" + window_state);
             }
-
         }
 
-        if (iTime >= 06 && iTime <= 15) {//낮
+        if (iTime >= 06 && iTime <= 12) {//낮
 
             restoreState();
             Log.d("window_state 값 다시받음", window_state + "");
             if (dustSettingState == 1 && rainSettingState == 0) {//미세먼지만 자동개폐 on
                 if (window_state == 1) {
                     if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_open_bright)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(dustOpenBright)
                                 .into(FirstFragment.imageView);
                     }
                 } else {
                     if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_close_bright)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(dustCloseBright)
                                 .into(FirstFragment.imageView);
                     }
@@ -415,43 +601,61 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
                 if (window_state == 1) {
                     if (rainValue > 0) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(rainOpenBright)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_open_bright)
                                 .into(FirstFragment.imageView);
                     }
                 } else if (window_state == 0) {
                     if (rainValue > 0) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(rainCloseBright)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_close_bright)
                                 .into(FirstFragment.imageView);
                     }
                 }
-            }else if (dustSettingState == 1 && rainSettingState == 1) {//둘 다 자동개폐 on
-                if (window_state == 1) {
+            }else if ((dustSettingState == 1 && rainSettingState == 1) || (dustSettingState == 0 && rainSettingState == 0) ) {//둘 다 자동개폐 on
+                if (window_state == 1) {//비가 안 옴
+
                         if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                            Glide.with(getApplicationContext())
+                            Glide.with(context)
                                     .load(state_open_bright)
                                     .into(FirstFragment.imageView);
 
                         } else {
-                            Glide.with(getApplicationContext())
-                                    .load(dustOpenBright)
-                                    .into(FirstFragment.imageView);
-                        }
 
-                }else{
-                            Glide.with(getApplicationContext())
+                                Glide.with(context)
+                                        .load(dustOpenBright)
+                                        .into(FirstFragment.imageView);
+
+                        }
+                }else{//비가 오거나 비가 안 오는데 실외 미세먼지가 더 높음
+
+                    Log.d("rainValue 상태", rainValue+"");
+                        if(rainValue>=30) {
+                            Glide.with(context)
                                     .load(rainCloseBright)
                                     .into(FirstFragment.imageView);
+                        }else{
+                            if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                                Glide.with(context)
+                                        .load(state_close_bright)
+                                        .into(FirstFragment.imageView);
 
+                            } else {
+
+                                    Glide.with(context)
+                                            .load(dustCloseBright)
+                                            .into(FirstFragment.imageView);
+
+                            }
+                        }
 
                 }
             }
@@ -463,21 +667,21 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
             if (dustSettingState == 1 && rainSettingState == 0) {//미세먼지만 자동개폐 on
                 if (window_state == 1) {
                     if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_open_dark)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(dustOpenDark)
                                 .into(FirstFragment.imageView);
                     }
                 } else {
                     if ((industValue.equals("좋음") || industValue.equals("보통")) && (outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_close_dark)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(dustCloseDark)
                                 .into(FirstFragment.imageView);
                     }
@@ -486,42 +690,105 @@ public class MainActivity extends AppCompatActivity implements MqttCallback {
 
                 if (window_state == 1) {
                     if (rainValue > 0) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(rainOpenDark)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_open_dark)
                                 .into(FirstFragment.imageView);
                     }
                 } else if (window_state == 0) {
                     if (rainValue > 0) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(rainCloseDark)
                                 .into(FirstFragment.imageView);
                     } else {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_close_dark)
                                 .into(FirstFragment.imageView);
                     }
                 }
-            }else if (dustSettingState == 1 && rainSettingState == 1) {//둘 다 자동개폐 on
-                if (window_state == 1) {
+            }else if ((dustSettingState == 1 && rainSettingState == 1)) {//둘 다 자동개폐 on
+                if (window_state == 1) {//비가 안 옴
+
                     if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
-                        Glide.with(getApplicationContext())
+                        Glide.with(context)
                                 .load(state_open_dark)
                                 .into(FirstFragment.imageView);
 
                     } else {
-                        Glide.with(getApplicationContext())
+
+                        Glide.with(context)
                                 .load(dustOpenDark)
                                 .into(FirstFragment.imageView);
+
+                    }
+                }else{//비가 오거나 비가 안 오는데 실외 미세먼지가 더 높음
+
+                    Log.d("rainValue 상태", rainValue+"");
+                    if(rainValue>=30) {
+                        Glide.with(context)
+                                .load(rainCloseDark)
+                                .into(FirstFragment.imageView);
+                    }else{
+                        if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                            Glide.with(context)
+                                    .load(state_close_dark)
+                                    .into(FirstFragment.imageView);
+
+                        } else {
+
+                            Glide.with(context)
+                                    .load(dustCloseDark)
+                                    .into(FirstFragment.imageView);
+
+                        }
                     }
 
-                }else{
-                    Glide.with(getApplicationContext())
-                            .load(rainCloseDark)
-                            .into(FirstFragment.imageView);
+                }
+            }else if((dustSettingState == 0 && rainSettingState == 0)){//둘 다 자동개폐 off
+                Log.d("rainValue 상태", rainValue+"");
+                if (window_state == 1) {
+                    if(rainValue>=30){
+                        Glide.with(context)
+                                .load(rainOpenDark)
+                                .into(FirstFragment.imageView);
+                    }else {
+                        if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                            Glide.with(context)
+                                    .load(state_open_dark)
+                                    .into(FirstFragment.imageView);
+
+                        } else {
+
+                            Glide.with(context)
+                                    .load(dustOpenDark)
+                                    .into(FirstFragment.imageView);
+
+                        }
+                    }
+                }else{//비가 오거나 비가 안 오는데 실외 미세먼지가 더 높음
+                    Log.d("rainValue 상태", rainValue+"");
+                    if(rainValue>=30) {
+                        Glide.with(context)
+                                .load(rainCloseDark)
+                                .into(FirstFragment.imageView);
+                    }else{
+                        if ((outdustValue.equals("좋음") || outdustValue.equals("보통"))) {
+                            Glide.with(context)
+                                    .load(state_close_dark)
+                                    .into(FirstFragment.imageView);
+
+                        } else {
+
+                            Glide.with(context)
+                                    .load(dustCloseDark)
+                                    .into(FirstFragment.imageView);
+
+                        }
+                    }
+
                 }
             }
         }

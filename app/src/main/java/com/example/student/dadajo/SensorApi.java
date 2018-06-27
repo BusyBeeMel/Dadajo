@@ -33,7 +33,7 @@ public interface SensorApi {
 
     static SensorApi service =
             new Retrofit.Builder()
-                    .baseUrl("http://192.168.0.4:8080/dadajo2/api/sensor/")  //통신할 서버 주소
+                    .baseUrl("http://192.168.43.151:8080/dadajo2/api/sensor/")  //통신할 서버 주소
                     .addConverterFactory(GsonConverterFactory.create())     //문자열->객체 변환시 gson converter를 쓰겠다.
                     .build()   //클래스 생성
                     .create(SensorApi.class);     //타입지정하여 인스턴스 생성
